@@ -3,7 +3,7 @@
   "channel": "area52",
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
-  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.1/manifest.json",
-  "manifest_sha256": "d7712b99d616a764719b1c8cf9ff6ee7b1318a82833d6f7ad5bdcd94a5631f31",
+  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.2/manifest.json",
+  "manifest_sha256": "ec86a30622717a1e0587059a0cae9a3683c279be4190711dbc7d90f4174a116d",
   "message": "Tested Area 52 client update; launcher 0.3.5 required."
 }
