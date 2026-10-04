@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "channel": "area52",
+  "enabled": false,
+  "message": "No Area 52 patch is published yet. Use the COACore client from its Discord."
+}
