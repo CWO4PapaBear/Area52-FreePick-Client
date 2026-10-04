@@ -1,6 +1,9 @@
 {
   "schema": 1,
   "channel": "area52",
-  "enabled": false,
-  "message": "No Area 52 patch is published yet. Use the COACore client from its Discord."
+  "name": "Area 52 - Free Pick Alpha Dev",
+  "enabled": true,
+  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.1/manifest.json",
+  "manifest_sha256": "d7712b99d616a764719b1c8cf9ff6ee7b1318a82833d6f7ad5bdcd94a5631f31",
+  "message": "Tested Area 52 client update; launcher 0.3.5 required."
 }
