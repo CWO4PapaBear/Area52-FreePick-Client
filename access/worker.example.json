@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "channel": "area52",
+  "database": "CONFIGURE_AREA52_AUTH_DATABASE",
+  "realm_id": 0,
+  "mysql": "mysql",
+  "mysql_config": "/run/secrets/area52-provisioner.cnf"
+}

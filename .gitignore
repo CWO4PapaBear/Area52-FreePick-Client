@@ -1,0 +1,11 @@
+local/
+dist/
+__pycache__/
+*.pyc
+*.mpq
+*.MPQ
+*.zip
+*.exe
+*.dll
+*.wtf
+.env*
