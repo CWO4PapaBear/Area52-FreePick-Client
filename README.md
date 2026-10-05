@@ -8,4 +8,8 @@ This repository does not distribute the full client, personal settings or caches
 
 Future releases must pin hashes and matching server revisions, preserve effective Area 52 overlays, and be tested before promotion. The inventory tool is read-only preparation and does not approve any file for redistribution. No proprietary client archives belong in Git history.
 
+## Full repair coverage follow-up
+
+The existing 86-file baseline covers about 42 GiB; a hash record alone does not provide repair bytes. Complete baseline repair requires versioned release assets for every supported file, including reviewed runtime files, and chunked downloads for large archives. The current updater has a 2 GiB component limit and a 16 GiB release limit; it cannot yet distribute this full baseline. Keep verified assembly, free-space checks, rollback, private-file exclusions and separate realm channels when extending it. Generate a coverage report for each release so an unrepairable baseline file is an explicit tracking gap rather than something discovered only by testers. The alpha.3 package addresses the reported files, not full baseline repair coverage.
+
 The `access/` directory preserves an inactive invitation-service prototype from the earlier private-distribution design. It is not used by this public feed or by the launcher's Discord account flow. No service, credentials or provisioning worker is deployed. Tests: `python -m unittest discover -s tests`.
