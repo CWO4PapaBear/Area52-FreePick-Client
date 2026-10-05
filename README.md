@@ -4,7 +4,7 @@ Public update feed for Area 52-specific patches. Obtain the base client from the
 
 This repository does not distribute the full client, personal settings or caches. The Bear Cave Launcher has a separate Area 52 client folder, update feed and connection configuration. Patch downloads require no invitation keys. Game accounts are managed by the server owner.
 
-`channels/area52.json` publishes the tested Area 52 overlays and an 86-file client baseline. Launcher 0.3.5 or later is required. Base-client differences are reported but not overwritten. Realm addresses remain deployment configuration; external Area 52 access uses auth port 3725 and world port 8086.
+`channels/area52.json` publishes the tested Area 52 overlays and an 86-file client baseline. The base-repair package requires launcher 0.3.6. Reviewed base files (Ascension.ok, patch-M and patch-S) are repaired with backups, alongside Area 52 overlays. Other baseline differences are reported and block launch pending review. Realm addresses remain deployment configuration; external Area 52 access uses auth port 3725 and world port 8086.
 
 Future releases must pin hashes and matching server revisions, preserve effective Area 52 overlays, and be tested before promotion. The inventory tool is read-only preparation and does not approve any file for redistribution. No proprietary client archives belong in Git history.
 
