@@ -2,14 +2,16 @@
 
 Public update feed for Area 52-specific patches. Obtain the base client from the [COACore Discord](https://discord.gg/RAkxswQ7Gx). Request a game account through [Bear Cave Discord](https://discord.gg/ZkzWqsCqkt).
 
-This repository does not distribute the full client, personal settings or caches. The Bear Cave Launcher has a separate Area 52 client folder, update feed and connection configuration. Patch downloads require no invitation keys. Game accounts are managed by the server owner.
+This repository hosts versioned client repair assets in GitHub Releases, never in Git history. Personal settings, account data, caches and optional addons are excluded. The Bear Cave Launcher has a separate Area 52 client folder, update feed and connection configuration. Downloads require no invitation keys. Game accounts are managed by the server owner.
 
 `channels/area52.json` publishes the tested Area 52 overlays and an 86-file client baseline. The base-repair package requires launcher 0.3.6. Reviewed base files (Ascension.ok, patch-M and patch-S) are repaired with backups, alongside Area 52 overlays. Other baseline differences are reported and block launch pending review. Realm addresses remain deployment configuration; external Area 52 access uses auth port 3725 and world port 8086.
 
 Future releases must pin hashes and matching server revisions, preserve effective Area 52 overlays, and be tested before promotion. The inventory tool is read-only preparation and does not approve any file for redistribution. No proprietary client archives belong in Git history.
 
-## Full repair coverage follow-up
+## Full repair coverage
 
-The existing 86-file baseline covers about 42 GiB; a hash record alone does not provide repair bytes. Complete baseline repair requires versioned release assets for every supported file, including reviewed runtime files, and chunked downloads for large archives. The current updater has a 2 GiB component limit and a 16 GiB release limit; it cannot yet distribute this full baseline. Keep verified assembly, free-space checks, rollback, private-file exclusions and separate realm channels when extending it. Generate a coverage report for each release so an unrepairable baseline file is an explicit tracking gap rather than something discovered only by testers. The alpha.3 package addresses the reported files, not full baseline repair coverage.
+The alpha.4 candidate extends the 86-file baseline to required content data, cinematics, UI assets and Area 52 addons. `tools/prepare_full_client.py` packages the owner-tested client as independently hashed 256 MiB chunks, checks existing baseline hashes and detects source changes during packaging. Launcher 0.3.7 requires complete coverage of every baseline entry. It verifies assembled files before installation and reuses valid chunks after an interruption. Large files and the total baseline are no longer restricted by the legacy ZIP limits. Extra MPQs are quarantined with verified backups rather than left to override tested assets.
+
+Only approved local client/server pairs are promoted. This package is not a claim to be the latest upstream Discord release. Upstream release identity and the current Discord attachment remain separate tracking gaps; no upstream feed is consumed automatically. Client repair publication requires staged-chunk verification, installation/rollback checks and remote asset verification before updating `channels/area52.json`.
 
 The `access/` directory preserves an inactive invitation-service prototype from the earlier private-distribution design. It is not used by this public feed or by the launcher's Discord account flow. No service, credentials or provisioning worker is deployed. Tests: `python -m unittest discover -s tests`.
