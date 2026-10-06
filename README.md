@@ -19,3 +19,9 @@ The `access/` directory preserves an inactive invitation-service prototype from 
 ## Alpha.4 verification
 
 All 503 files (46,511,924,062 bytes) passed an isolated installation and full baseline comparison. Personal settings and extra-archive backup preservation passed. All 642 remote release assets passed digest verification, with downloaded samples verified independently. Launcher tests: 85 run, one skipped; client repository tests: 8 passed. Launcher 0.3.7 and client alpha.4 are separate published releases.
+
+## Outland altar marker revision
+
+The alpha.4 manifest refresh adds three Area 52 Ancient Enchanting Altar map/minimap markers: Netherstorm (Top of the Violet Tower), Terokkar Forest (Balcony above Mana-Tombs), and Nagrand (Deep within Oshu'Gun). The existing native icon 188 and scale 1.5 match Azeroth. Source is under `client/Interface/AddOns/Area52MysticRules`; the existing addon loads the marker file. Repeated world-entry registration replaces markers by ID. Other realms do not register them.
+
+The release retains the previous manifest as `manifest-before-altars.json`; unchanged chunks remain available. Full repair still covers all baseline files. This client-only marker change uses the existing saved server altar placements and needs no server restart. Lua 5.1 checks against the recovered map API passed for repeated registration, descriptions, icon, and realm gating. Visual gameplay verification remains pending. Upstream reviewed: `36a3d8b506f8dabaee3faac3cf117a9ee2d03f79`.

@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "c3fcd3206d78e4f65714eee89d7163d96416f0376a0ee48f69abbb8dba413e7e",
-  "message": "Full Area 52 client repair is available; restart launcher to install 0.3.7 first."
+  "manifest_sha256": "b39be98cf1323e54000d86abf43a5e97eb8943c635c8e2c3d63e73dd7178ae9c",
+  "message": "Outland Ancient Enchanting Altar map markers available. Full client repair remains available."
 }

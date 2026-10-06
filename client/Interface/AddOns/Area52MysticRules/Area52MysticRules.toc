@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: Area 52 Mystic Enchant Rules
+## Notes: Mystic Enchant slot capacity for Area 52.
+## Version: 0.1.0
+## OptionalDeps: Ascension_EnchantCollection
+Area52MysticRules.lua
+OutlandAltarPOIs.lua
