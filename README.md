@@ -25,3 +25,8 @@ All 503 files (46,511,924,062 bytes) passed an isolated installation and full ba
 The alpha.4 manifest refresh adds three Area 52 Ancient Enchanting Altar map/minimap markers: Netherstorm (Top of the Violet Tower), Terokkar Forest (Balcony above Mana-Tombs), and Nagrand (Deep within Oshu'Gun). The existing native icon 188 and scale 1.5 match Azeroth. Source is under `client/Interface/AddOns/Area52MysticRules`; the existing addon loads the marker file. Repeated world-entry registration replaces markers by ID. Other realms do not register them.
 
 The release retains the previous manifest as `manifest-before-altars.json`; unchanged chunks remain available. Full repair still covers all baseline files. This client-only marker change uses the existing saved server altar placements and needs no server restart. Lua 5.1 checks against the recovered map API passed for repeated registration, descriptions, icon, and realm gating. Visual gameplay verification remains pending. Upstream reviewed: `36a3d8b506f8dabaee3faac3cf117a9ee2d03f79`.
+
+## Guardian heirloom shop update
+
+The October 6 heirloom manifest refresh installs the paired ItemExtendedCost table for Area 52 server source 0b7e7e45a71ef961443a12ff0228f02034b68959. Browse Heirlooms opens Armor, Weapons and Accessories. Armor costs 500 Runes of Ascension; weapons, rings, necklaces and trinkets cost 1000; nine-piece armor caches cost 3600. Purchases require level 60. Added armor XP effects are server-side. The 504-file baseline remains fully covered; only the Area 52 overlay component changed. The new archive and manifest were downloaded and hash-verified before promotion. The previous manifest and assets remain available for rollback. Client visual acceptance remains pending.
+

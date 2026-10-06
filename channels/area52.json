@@ -3,7 +3,7 @@
   "channel": "area52",
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
-  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "b39be98cf1323e54000d86abf43a5e97eb8943c635c8e2c3d63e73dd7178ae9c",
-  "message": "Outland Ancient Enchanting Altar map markers available. Full client repair remains available."
+  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest-heirlooms-20261006.json",
+  "manifest_sha256": "f60fafea86e74b686a648836de7fcc7a7c1cd8e1ead26db1d53328b2c9b7d577",
+  "message": "Guardian heirloom shops: armor 500, weapons/accessories 1000, armor caches 3600 Runes of Ascension. Update client before shopping."
 }
