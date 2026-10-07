@@ -49,6 +49,38 @@ function ca.UnlearnID(ids, ...)
     return originalUnlearn(ids, ...)
 end
 
+local function AttachRuneTooltip(popup, label, costLine)
+    if not popup then return end
+    local text = popup.text or _G[popup:GetName() .. "Text"]
+    local measure = popup.area52CostMeasure or popup:CreateFontString(nil, "ARTWORK")
+    popup.area52CostMeasure = measure
+    measure:SetFontObject(text:GetFontObject())
+    measure:SetWidth(text:GetWidth())
+    measure:SetText(CONFIRM_UNLEARN_ALL_S:format(label, "\n\n") .. "A")
+    local _, fontSize = text:GetFont()
+    local costTop = measure:GetStringHeight() - fontSize
+    measure:SetWidth(0)
+    measure:SetText(costLine)
+    local costWidth = measure:GetStringWidth()
+    measure:Hide()
+    local icon = popup.area52RuneIcon
+    if not icon then
+        icon = CreateFrame("Button", nil, popup)
+        popup.area52RuneIcon = icon
+        icon:SetSize(22, 22)
+        icon:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetHyperlink("item:375250")
+            GameTooltip:Show()
+        end)
+        icon:SetScript("OnLeave", function() GameTooltip:Hide() end)
+        popup:HookScript("OnHide", function() icon:Hide(); GameTooltip:Hide() end)
+    end
+    icon:ClearAllPoints()
+    icon:SetPoint("TOP", text, "TOP", costWidth / 2 - 10, -costTop)
+    icon:Show()
+end
+
 local function BindReset(talents)
     local suffix = talents and "Talents" or "Spells"
     local prefix = talents and "CA_PURGE_TALENTS_" or "CA_PURGE_ABILITIES_"
@@ -76,11 +108,15 @@ local function BindReset(talents)
         if not rules.Enabled() then return originalConfirm(...) end
         local ok, reason = ca["CanUnlearnAll" .. suffix]()
         if not ok then UIErrorsFrame:AddMessage(_G[reason] or reason, 1, 0, 0); return false end
-        local warning = "\nCost: 250 Runes of Ascension.\n\nThis will deactivate your Active Build and turn off automatic learning. Your saved build will remain in the library."
+        local item = Item:CreateFromID(375250)
+        local costLine = "|cffff0000Cost:|r 250 " .. item:GetIconTextureMarkup(20)
+        local warning = "\n\n" .. costLine .. "\n\nThis will turn off Auto-Learn Spells for your |cffffff00Active Build|r. Your Active Build will remain selected.\n\nYour saved build will remain in the library."
         if C_GameMode:IsGameModeActive(Enum.GameMode.BuildDraft) and UnitLevel("player") > 10 then
-            warning = warning .. "\n\nLeaving DRAFT BUILD mode forfeits its max-level reward: Mystic Enchants added to your collection."
+            warning = warning .. "\n\nResetting above level 10 forfeits your DRAFT BUILD max-level reward: Mystic Enchants added to your collection."
         end
-        StaticPopup_Show("CONFIRM_UNLEARN_ALL_S", talents and TALENTS or ABILITIES, warning, ca["UnlearnAll" .. suffix])
+        local label = talents and TALENTS or ABILITIES
+        local popup = StaticPopup_Show("CONFIRM_UNLEARN_ALL_S", label, warning, ca["UnlearnAll" .. suffix])
+        AttachRuneTooltip(popup, label, costLine)
         return true
     end
 end

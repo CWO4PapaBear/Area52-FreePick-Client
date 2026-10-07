@@ -26,8 +26,14 @@ for _, suffix in ipairs({"Talents","Spells"}) do
  C_CharacterAdvancement["UnlearnAll"..suffix]=function() sent=sent+1; return true end
 end
 CharacterAdvancementUtil={ConfirmOrUnlearnAllTalents=function() return "native" end,ConfirmOrUnlearnAllSpells=function() return "native" end}
+Item={CreateFromID=function() return {GetIconTextureMarkup=function() return "ICON" end} end}
 TALENTS="talents"; ABILITIES="abilities"; UIErrorsFrame={AddMessage=function() end}
-function StaticPopup_Show(key, label, warning, callback) popup={key,label,warning,callback} end
+CONFIRM_UNLEARN_ALL_S="Unlearn all %s?%s"
+local measure={SetFontObject=function() end,SetWidth=function() end,SetText=function() end,GetStringHeight=function() return 40 end,GetStringWidth=function() return 100 end,Hide=function() end}
+frame={text={GetFontObject=function() return "font" end,GetWidth=function() return 290 end,GetFont=function() return "font",12 end},CreateFontString=function() return measure end,HookScript=function() end}
+GameTooltip={SetOwner=function() end,SetHyperlink=function(self,link) tooltipLink=link end,Show=function() end,Hide=function() tooltipLink=nil end}
+function CreateFrame() return {SetSize=function() end,SetScript=function(self,key,func) self[key]=func end,ClearAllPoints=function() end,SetPoint=function() end,Show=function() end,Hide=function() end} end
+function StaticPopup_Show(key, label, warning, callback) popup={key,label,warning,callback};return frame end
 ''')
 lua.execute(Path(os.environ['AREA52_RESET_LUA']).read_text(encoding='utf-8-sig'))
 lua.execute('''
@@ -35,8 +41,13 @@ for _, suffix in ipairs({"Talents","Spells"}) do
  runes=250; combat=false; spent=1; dead=false
  assert(C_CharacterAdvancement["CanUnlearnAll"..suffix]())
  assert(CharacterAdvancementUtil["ConfirmOrUnlearnAll"..suffix]())
- assert(string.find(popup[3],"250 Runes",1,true))
- assert(string.find(popup[3],"deactivate",1,true))
+ assert(string.find(popup[3],"Cost:|r 250",1,true))
+ assert(string.find(popup[3],"remain selected",1,true))
+ assert(string.find(popup[3],"|cffff0000Cost:|r",1,true))
+ assert(string.find(popup[3],"|cffffff00Active Build|r",1,true))
+ assert(string.find(popup[3],"\\n\\nYour saved",1,true))
+ frame.area52RuneIcon:OnEnter(); assert(tooltipLink=="item:375250")
+ frame.area52RuneIcon:OnLeave(); assert(tooltipLink==nil)
  local before=sent
  assert(sent==before)
  runes=249; assert(not popup[4]()); assert(sent==before)
