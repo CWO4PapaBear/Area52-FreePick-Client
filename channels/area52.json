@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "f60fafea86e74b686a648836de7fcc7a7c1cd8e1ead26db1d53328b2c9b7d577",
-  "message": "Guardian heirloom shops: armor 500, weapons/accessories 1000, armor caches 3600 Runes of Ascension. Update client before shopping."
+  "manifest_sha256": "2a26238fcce93181c3de784adcd51d18926626c6c0108d44bc2e7bd2073f6b5f",
+  "message": "Engineering tooltip update: 783 advancement entries VERIFIED, including 10 reviewed scripted abilities. Original SHIFT details and Mastery grouping preserved. Gameplay certification remains separate."
 }
