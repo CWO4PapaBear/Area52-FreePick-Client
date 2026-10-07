@@ -110,7 +110,7 @@ local function BindReset(talents)
         if not ok then UIErrorsFrame:AddMessage(_G[reason] or reason, 1, 0, 0); return false end
         local item = Item:CreateFromID(375250)
         local costLine = "|cffff0000Cost:|r 250 " .. item:GetIconTextureMarkup(20)
-        local warning = "\n\n" .. costLine .. "\n\nThis will turn off Auto-Learn Spells for your |cffffff00Active Build|r. Your Active Build will remain selected.\n\nYour saved build will remain in the library."
+        local warning = "\n\n" .. costLine .. "\n\nThis will turn off Auto-Learn Spells for your |cffffff00Active Build|r. It will remain selected.\n\nYour saved build will remain in the library."
         if C_GameMode:IsGameModeActive(Enum.GameMode.BuildDraft) and UnitLevel("player") > 10 then
             warning = warning .. "\n\nResetting above level 10 forfeits your DRAFT BUILD max-level reward: Mystic Enchants added to your collection."
         end
