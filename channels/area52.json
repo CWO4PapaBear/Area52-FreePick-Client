@@ -3,7 +3,7 @@
   "channel": "area52",
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
-  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "2a26238fcce93181c3de784adcd51d18926626c6c0108d44bc2e7bd2073f6b5f",
-  "message": "Engineering tooltip update: 783 advancement entries VERIFIED, including 10 reviewed scripted abilities. Original SHIFT details and Mastery grouping preserved. Gameplay certification remains separate."
+  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest-resets-prestige-20261007.json",
+  "manifest_sha256": "0ef2e303ad4b5ce65578a4652ea5ddc40845f8cd2cd375ead0571370b8533030",
+  "message": "Area 52 reset controls: 250 Runes of Ascension, updated confirmation, Active Build retained with Auto-Learn disabled. Chromie Prestige repair is live on the server."
 }

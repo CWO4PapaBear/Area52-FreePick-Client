@@ -13,4 +13,6 @@ Run `tests/reset_ui_checks.py` through the CoA `tools/verify_all.py` harness ent
 The reset popup uses a red Cost label, a rune icon with a hover tooltip, a yellow Active Build label and separated saved-build text. Lua 5.1 checks exercise tooltip enter/leave as well as confirmation behavior. Visual placement still requires client acceptance.
 
 
-The redundant “It will remain selected.” sentence is omitted from the confirmation; the server still retains the Active Build and disables only automatic learning.
+The redundant ï¿½It will remain selected.ï¿½ sentence is omitted from the confirmation; the server still retains the Active Build and disables only automatic learning.
+
+Tester promotion (2026-10-07): channels/area52.json now selects manifest-resets-prestige-20261007.json. The patch-B component was reconstructed through the launcher installer and both new remote assets were downloaded and hash-verified. All other 503 baseline records remain unchanged. Paired Area 52 server binary: bb06454972575a468bd52ded00e5750406a077bfea1314b691b2b69497da6f8c. Existing launcher 0.3.7 or newer supports this feed; no executable change is required.
