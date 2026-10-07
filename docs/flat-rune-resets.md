@@ -1,0 +1,11 @@
+# Area 52 flat rune resets
+
+`client/FrameXML/Area52RuneResets.lua` is appended after the existing CharacterAdvancementUtil.lua definitions in the managed patch-B archive. It is shared FrameXML code, not an optional addon. Enable only with the paired server boolean `CONFIG_AREA52_FLAT_RUNE_RESETS` and the existing Hero purge boolean. Non-Hero and Wildcard clients retain native behavior.
+
+A single selected-entry removal costs 250 Runes of Ascension (375250); each Reset All category costs 250 total. The client retains native eligibility restrictions while replacing the full-reset currency check, excludes bank holdings, always confirms, and rechecks affordability on acceptance. Server validation remains authoritative. Full resets clear the active build and disable automatic learning; the saved library build remains. Cancel does not send the reset request.
+
+The confirmation includes the future Draft reward warning above level 10. Draft eligibility/reward enforcement is a separate, deferred system; the text is not proof that Draft support is implemented.
+
+Verification: Lua 5.1 harness passed for 249/250 rune boundaries, combat/death/empty categories, confirmation and acceptance, mode gates, mastery notices and Draft warning threshold. The paired server passed four isolated exploratory native pricing tests; combined gameplay verification was unavailable because only external exploratory scenarios ran. All staged archive members were read back and verified. Real-client acceptance remains pending.
+
+Run `tests/reset_ui_checks.py` through the CoA `tools/verify_all.py` harness entrypoint, setting AREA52_LUPA_PATH to an existing Lupa installation and AREA52_RESET_LUA to the Lua source. No client archive, installation or launcher channel promotion is included in this source commit.
