@@ -42,7 +42,7 @@ for _, suffix in ipairs({"Talents","Spells"}) do
  assert(C_CharacterAdvancement["CanUnlearnAll"..suffix]())
  assert(CharacterAdvancementUtil["ConfirmOrUnlearnAll"..suffix]())
  assert(string.find(popup[3],"Cost:|r 250",1,true))
- assert(string.find(popup[3],"remain selected",1,true))
+ assert(not string.find(popup[3],"It will remain selected.",1,true))
  assert(string.find(popup[3],"|cffff0000Cost:|r",1,true))
  assert(string.find(popup[3],"|cffffff00Active Build|r",1,true))
  assert(string.find(popup[3],"\\n\\nYour saved",1,true))

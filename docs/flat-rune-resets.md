@@ -12,3 +12,5 @@ Run `tests/reset_ui_checks.py` through the CoA `tools/verify_all.py` harness ent
 
 The reset popup uses a red Cost label, a rune icon with a hover tooltip, a yellow Active Build label and separated saved-build text. Lua 5.1 checks exercise tooltip enter/leave as well as confirmation behavior. Visual placement still requires client acceptance.
 
+
+The redundant “It will remain selected.” sentence is omitted from the confirmation; the server still retains the Active Build and disables only automatic learning.
