@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "dc8d7343d7ba862beaf79761b6f06f733810a36380cbd3dca9d9309473a7774c",
-  "message": "22 advancement abilities VERIFIED; rank-chain repairs and preserved SHIFT tooltips."
+  "manifest_sha256": "5f5d927c91656ceaff90e4d78fc3b6263f404acdb9e819607ba58294ea38e6e9",
+  "message": "Life Tap, Wyvern Sting, Mind Sear and Mutilate repairs; 38 tester-certified abilities and red/yellow/green status labels."
 }
