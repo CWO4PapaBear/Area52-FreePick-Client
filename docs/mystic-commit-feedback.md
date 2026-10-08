@@ -42,3 +42,8 @@ preview and initialization calls with empty neighboring slots. The promotion ver
 now requires both the manifest baseline and component hash for this addon to match
 the checked-in source. This prevents Check/Repair from reinstalling an old sorter.
 Live rendering and reconnect acceptance remain player checks.
+
+The owner confirmed on October 8 that the slot-placement repair worked in game.
+This confirms the reported relocation fix; no separate reconnect or spec-swap
+result was supplied. The public tester feed was rechecked through the actual
+launcher validator after this confirmation and accepted the corrected manifest.
