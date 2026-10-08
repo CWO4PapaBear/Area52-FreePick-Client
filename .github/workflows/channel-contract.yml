@@ -1,0 +1,15 @@
+name: Client channel contract
+on:
+  push:
+    paths: ['channels/**', 'tests/test_channel_contract.py', '.github/workflows/channel-contract.yml']
+  pull_request:
+    paths: ['channels/**', 'tests/test_channel_contract.py', '.github/workflows/channel-contract.yml']
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -p test_channel_contract.py
