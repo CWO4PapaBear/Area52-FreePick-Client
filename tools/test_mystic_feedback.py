@@ -56,6 +56,19 @@ for _, data in ipairs({{0,0,0,0,17}, {0,11,0,22}, {11,11,11}}) do
 end
 savedMap={5,4,3,2,1};u:Init()
 for i=1,17 do assert(u.slotMap[i]==i and savedMap[i]==i) end
+for slot=1,17 do
+ for quality=2,5 do
+  if u:CanApplyQualityToSlot(slot,quality) then
+   local data={}; for i=1,17 do data[i]=0 end; data[slot]=1000+quality
+   for repeatIndex=1,3 do
+    local map=u:GetSlotMapForEnchants(data)
+    local preview=u:GetFakePositionMap(data)
+    u:Init()
+    for i=1,17 do assert(map[i]==i and preview[i]==i and u.slotMap[i]==i) end
+   end
+  end
+ end
+end
 assert(u:CanApplyQualityToSlot(1,4))
 assert(not u:CanApplyQualityToSlot(5,4))
 resultCallback('RE_COLLECTION_REFORGE_OK'); assert(sounds==0)

@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "5f5d927c91656ceaff90e4d78fc3b6263f404acdb9e819607ba58294ea38e6e9",
-  "message": "Life Tap, Wyvern Sting, Mind Sear and Mutilate repairs; 38 tester-certified abilities and red/yellow/green status labels."
+  "manifest_sha256": "def088657ca6a5dac306c0fb052146249749ac20aa8f9abc905b7772be197187",
+  "message": "Mystic Enchants retain their chosen slots, including lower-rarity enchants in higher-rarity slots; restores commit feedback."
 }

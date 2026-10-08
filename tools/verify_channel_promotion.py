@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -30,5 +31,12 @@ if not args.live:
         return fetch(url)
     updater.fetch = candidate_fetch
 manifest = updater.latest("area52")
+relative = "Interface/AddOns/Area52MysticRules/Area52MysticRules.lua"
+source = Path(__file__).resolve().parents[1] / "client" / relative
+expected_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+baseline = next(row for row in manifest["baseline"] if row["path"] == relative)
+component = next(row for group in manifest["components"] for row in group["files"] if row["path"] == relative)
+if baseline["sha256"] != expected_hash or component["sha256"] != expected_hash:
+    raise ValueError("Published Mystic Rules differs from reviewed source; refusing an outdated slot-sorting addon")
 print("PASS: actual launcher accepted the channel URL, downloaded manifest, checksum, release identity and baseline schema.")
 print(manifest["tag"])
