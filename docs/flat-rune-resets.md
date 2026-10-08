@@ -16,3 +16,5 @@ The reset popup uses a red Cost label, a rune icon with a hover tooltip, a yello
 The redundant �It will remain selected.� sentence is omitted from the confirmation; the server still retains the Active Build and disables only automatic learning.
 
 Tester promotion (2026-10-07): channels/area52.json now selects manifest-resets-prestige-20261007.json. The patch-B component was reconstructed through the launcher installer and both new remote assets were downloaded and hash-verified. All other 503 baseline records remain unchanged. Paired Area 52 server binary: bb06454972575a468bd52ded00e5750406a077bfea1314b691b2b69497da6f8c. Existing launcher 0.3.7 or newer supports this feed; no executable change is required.
+
+Publication correction: the launcher requires the canonical release asset name `manifest.json`. Dated manifest filenames may be retained as receipts but must not be used as channel targets. The October 7 pointer was corrected after a first-update rejection. The corrected pair passed the actual launcher latest() validator, and the canonical asset was downloaded and hash-verified. Run the channel contract regression before future promotions.
