@@ -5,3 +5,4 @@
 ## OptionalDeps: Ascension_EnchantCollection
 Area52MysticRules.lua
 OutlandAltarPOIs.lua
+TesterCertification.lua
