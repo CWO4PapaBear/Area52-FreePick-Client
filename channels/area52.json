@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "6524afbd622138b1e69b97efac5e81ee93246adaa387ae9a95b57ac07cbd4127",
-  "message": "Area 52 ability and talent proc repairs: 23 catalog entries marked VERIFIED; existing Mystic Enchant slot fixes preserved."
+  "manifest_sha256": "2bce82719201fb8e7a38619b293782e9e32567136bc0c0bc9654b3484514ed84",
+  "message": "Swift Hand of Justice healing repaired and equip animation removed; XP bonus unchanged."
 }
