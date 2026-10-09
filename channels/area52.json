@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "af231f606488662be6493435e9bdb37e677cb6b98780b51ff7d15224b7554f4c",
-  "message": "Tester certification: right-click VERIFIED abilities and talents."
+  "manifest_sha256": "6e298b8f84e271bdba16c8e24cadb6f0b2b2b6382e602a8d843aba1ec5715a53",
+  "message": "Death Knight Ability Essence costs reduced; rarity costs unchanged."
 }
