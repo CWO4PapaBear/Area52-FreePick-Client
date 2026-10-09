@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "def088657ca6a5dac306c0fb052146249749ac20aa8f9abc905b7772be197187",
-  "message": "Mystic Enchants retain their chosen slots, including lower-rarity enchants in higher-rarity slots; restores commit feedback."
+  "manifest_sha256": "6524afbd622138b1e69b97efac5e81ee93246adaa387ae9a95b57ac07cbd4127",
+  "message": "Area 52 ability and talent proc repairs: 23 catalog entries marked VERIFIED; existing Mystic Enchant slot fixes preserved."
 }
