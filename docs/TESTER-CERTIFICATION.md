@@ -15,5 +15,5 @@ currencies, or builds. The confirmation does not automatically prove the three g
 it records the tester's attestation.
 
 This source requires the matching Area 52 certification server package and its enabled configuration.
-It is staged source, not a published client release. Without the service, no certification option is
-offered. Mystic Enchant slots are outside this first advancement-menu implementation.
+The October 9 tester release pairs these files with the enabled server service. Without the service,
+no certification option is offered. Mystic Enchant slots are outside this first advancement-menu implementation.
