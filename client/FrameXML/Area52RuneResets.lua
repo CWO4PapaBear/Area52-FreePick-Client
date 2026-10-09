@@ -7,7 +7,19 @@ function rules.Enabled()
         and C_Player:IsHero() and not C_GameMode:IsGameModeActive(Enum.GameMode.WildCard)
 end
 
+local function Free()
+    return C_Config.GetBoolConfig("CONFIG_AREA52_FREE_RESETS") == true
+end
+
+local function Restricted()
+    if UnitIsDeadOrGhost("player") then return "CA_LEARN_NOT_WHILE_DEAD" end
+    if UnitAffectingCombat("player") then return "CA_LEARN_NOT_IN_COMBAT" end
+    local _, instanceType = IsInInstance()
+    if instanceType == "pvp" or instanceType == "arena" then return "CA_LEARN_NOT_IN_BATTLEGROUNDS" end
+end
+
 local function Cost(ids)
+    if Free() then return 0 end
     if type(ids) ~= "table" then return 250 end
     local seen, count = {}, 0
     for _, id in ipairs(ids) do
@@ -23,8 +35,13 @@ end
 local originalCanUnlearn = ca.CanUnlearnID
 function ca.CanUnlearnID(ids, ...)
     if not rules.Enabled() then return originalCanUnlearn(ids, ...) end
+    local blocked = Restricted()
+    if blocked then return false, blocked, 0 end
     local ok, reason, entry = originalCanUnlearn(ids, ...)
-    if not ok then return ok, reason, entry end
+    if not ok then
+        if not Free() or reason ~= "CA_UNLEARN_NO_UNLEARN_ITEM" then return ok, reason, entry end
+        ok, reason = true, "CA_UNLEARN_OK"
+    end
     if not HasRunes(Cost(ids)) then return false, "CA_UNLEARN_NO_UNLEARN_ITEM", type(ids) == "number" and ids or 0 end
     return ok, reason, entry
 end
@@ -39,7 +56,9 @@ function ca.ShouldConfirmUnlearnID(ids, ...)
             reasons[#reasons + 1] = reason
         end
     end
-    reasons[#reasons + 1] = {Error = Enum.CAConfirmReason.Marks, Arg1 = Cost(ids), Arg2 = 0}
+    if not Free() then
+        reasons[#reasons + 1] = {Error = Enum.CAConfirmReason.Marks, Arg1 = Cost(ids), Arg2 = 0}
+    end
     return true, reasons
 end
 
@@ -88,6 +107,8 @@ local function BindReset(talents)
     local originalReset = ca["UnlearnAll" .. suffix]
     ca["CanUnlearnAll" .. suffix] = function(...)
         if not rules.Enabled() then return originalCheck(...) end
+        local blocked = Restricted()
+        if blocked then return false, blocked end
         local ok, reason = originalCheck(...)
         if not ok and reason ~= prefix .. "NO_PURGE_ITEM" then return ok, reason end
         if UnitIsDeadOrGhost("player") then return false, "CA_LEARN_NOT_WHILE_DEAD" end
@@ -96,7 +117,7 @@ local function BindReset(talents)
         if not spent or spent == 0 then
             return false, prefix .. (talents and "NO_KNOWN_TALENTS" or "NO_KNOWN_ABILITIES")
         end
-        if not HasRunes(250) then return false, prefix .. "NO_PURGE_ITEM" end
+        if not Free() and not HasRunes(250) then return false, prefix .. "NO_PURGE_ITEM" end
         return true, prefix .. "OK"
     end
     ca["UnlearnAll" .. suffix] = function(...)
@@ -110,13 +131,14 @@ local function BindReset(talents)
         if not ok then UIErrorsFrame:AddMessage(_G[reason] or reason, 1, 0, 0); return false end
         local item = Item:CreateFromID(375250)
         local costLine = "|cffff0000Cost:|r 250 " .. item:GetIconTextureMarkup(20)
+        if Free() then costLine = "No cost." end
         local warning = "\n\n" .. costLine .. "\n\nThis will turn off Auto-Learn Spells for your |cffffff00Active Build|r.\n\nYour saved build will remain in the library."
         if C_GameMode:IsGameModeActive(Enum.GameMode.BuildDraft) and UnitLevel("player") > 10 then
             warning = warning .. "\n\nResetting above level 10 forfeits your DRAFT BUILD max-level reward: Mystic Enchants added to your collection."
         end
         local label = talents and TALENTS or ABILITIES
         local popup = StaticPopup_Show("CONFIRM_UNLEARN_ALL_S", label, warning, ca["UnlearnAll" .. suffix])
-        AttachRuneTooltip(popup, label, costLine)
+        if not Free() then AttachRuneTooltip(popup, label, costLine) end
         return true
     end
 end

@@ -6,7 +6,9 @@ from lupa.lua51 import LuaRuntime
 lua = LuaRuntime(unpack_returned_tuples=True)
 lua.execute('''
 enabled = true; runes = 250; combat = false; dead = false; spent = 1; draft = false; level = 11; sent = 0; hero = true; wildcard = false
-C_Config = {GetBoolConfig=function() return enabled end}
+free = false; instanceType = "none"
+C_Config = {GetBoolConfig=function(key) if key == "CONFIG_AREA52_FREE_RESETS" then return free end return enabled end}
+function IsInInstance() return instanceType ~= "none", instanceType end
 C_Player = {IsHero=function() return hero end}
 Enum = {GameMode={WildCard=1,BuildDraft=2},CAConfirmReason={Marks="marks",Gold="gold",Token="token",RemovesMastery="mastery",IncludesMastery="include"}}
 C_GameMode = {IsGameModeActive=function(self, mode) return mode == 1 and wildcard or mode == 2 and draft end}
@@ -68,4 +70,24 @@ enabled=false; runes=0; assert(C_CharacterAdvancement.CanUnlearnID(12)); assert(
 enabled=true; wildcard=true; assert(CharacterAdvancementUtil.ConfirmOrUnlearnAllSpells()=="native")
 wildcard=false; hero=false; assert(CharacterAdvancementUtil.ConfirmOrUnlearnAllSpells()=="native")
 ''')
-print('PASS: Lua 5.1 reset affordability, acceptance recheck, confirmation-only cancellation, mode gates, mastery reasons and Draft warning boundary')
+lua.execute("""
+hero=true; wildcard=false; enabled=true; free=true; runes=0; combat=false; dead=false; spent=1
+assert(C_CharacterAdvancement.CanUnlearnID({12,13}))
+local yes,reasons=C_CharacterAdvancement.ShouldConfirmUnlearnID({12,13})
+assert(yes and #reasons==1 and reasons[1].Error=="mastery")
+for _, suffix in ipairs({"Talents","Spells"}) do
+ assert(C_CharacterAdvancement["CanUnlearnAll"..suffix]())
+ assert(CharacterAdvancementUtil["ConfirmOrUnlearnAll"..suffix]())
+ assert(string.find(popup[3],"No cost.",1,true))
+ assert(not string.find(popup[3],"250",1,true))
+ local before=sent
+ combat=true; assert(not popup[4]()); assert(sent==before); combat=false
+ for _, kind in ipairs({"pvp","arena"}) do
+  instanceType=kind
+  assert(not C_CharacterAdvancement.CanUnlearnID(12))
+  assert(not popup[4]()); assert(sent==before)
+ end
+ instanceType="none"; assert(popup[4]()); assert(sent==before+1)
+end
+""")
+print('PASS: Lua 5.1 free and legacy paid resets, safety checks at confirmation and acceptance, mastery/Draft warnings and mode isolation')
