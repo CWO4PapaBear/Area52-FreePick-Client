@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "2bce82719201fb8e7a38619b293782e9e32567136bc0c0bc9654b3484514ed84",
-  "message": "Swift Hand of Justice healing repaired and equip animation removed; XP bonus unchanged."
+  "manifest_sha256": "a50d9d2aca3a5a6e245bbdce71b1cb5b817f512f1ee75979b73a736314e9a456",
+  "message": "Block, Legendary enchants, movement casting, and trainer/book updates."
 }
