@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "810e31f197a955e7583e4e74edd3a05a97e60bde8793bf26aeebd954aee339e0",
-  "message": "Free ability/talent resets, Active Build stat assignment, and Hoplite vanity update."
+  "manifest_sha256": "4e4ed9bde7f0290922b0789a4e8cc85335d815d1a9d521ed6935e4bef70966ae",
+  "message": "Account certification tracking, Mystic Enchant certification, and milestone rewards."
 }

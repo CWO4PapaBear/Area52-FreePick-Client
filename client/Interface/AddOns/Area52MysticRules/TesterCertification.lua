@@ -1,4 +1,5 @@
 local prefix = "A52CERT"
+local mysticMask = 2147483648
 local status = {}
 local receiving
 local ready = false
@@ -72,7 +73,7 @@ end
 local function ReplaceStatus(tooltip, left, right, spellID)
     if not Active() or not ready or not C_CharacterAdvancement then return end
     local entry = C_CharacterAdvancement.GetEntryBySpellID(spellID)
-    if not entry or status[entry.ID] ~= "C" then return end
+    if status[mysticMask + spellID] ~= "C" and (not entry or status[entry.ID] ~= "C") then return end
     local text = left:GetText()
     if text then
         local updated = text:gsub("|c[fF][fF][fF][fF][fF][fF]00VERIFIED|r", "|cff00ff00CERTIFIED|r")
@@ -122,3 +123,22 @@ frame:SetScript("OnEvent", function(self, event, incomingPrefix, message, channe
         end
     end
 end)
+
+StaticPopupDialogs["AREA52_CERTIFY_MYSTIC"] = {
+    text = "%s\n\nHave you confirmed that this Mystic Enchant:\n\n1. Functions as expected\n2. Its effects and granted abilities persist through logout and login while equipped\n3. Its effects and granted abilities are removed when unequipped, unless granted by another source.",
+    button1 = "CERTIFY", button2 = CANCEL, timeout = 0,
+    whileDead = true, hideOnEscape = true, preferredIndex = 3,
+    OnAccept = StaticPopupDialogs["AREA52_CERTIFY_ABILITY"].OnAccept,
+}
+SLASH_AREA52CERTIFYMYSTIC1 = "/a52certme"
+SlashCmdList["AREA52CERTIFYMYSTIC"] = function(message)
+    if not Active() or not ready then Print("Certification data is not ready."); return end
+    local spell = tonumber(message:match("^%s*(%d+)%s*$"))
+    if not spell or spell <= 0 or spell >= mysticMask then
+        Print("Use /a52certme followed by the Mystic Enchant spell ID."); return
+    end
+    local id = mysticMask + spell
+    if status[id] ~= "V" then Print("That Mystic Enchant is not awaiting certification."); return end
+    if pending then Print("Please wait for the current certification request."); return end
+    StaticPopup_Show("AREA52_CERTIFY_MYSTIC", GetSpellInfo(spell) or tostring(spell), nil, { id = id })
+end
