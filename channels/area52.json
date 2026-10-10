@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "4e4ed9bde7f0290922b0789a4e8cc85335d815d1a9d521ed6935e4bef70966ae",
-  "message": "Account certification tracking, Mystic Enchant certification, and milestone rewards."
+  "manifest_sha256": "51c015a237eed4ad29df93b71c3a66ee083ba7f7f573d7694f933bae7f79fca0",
+  "message": "Bear Cave certification leaderboard: account totals and automatic ranking updates."
 }
