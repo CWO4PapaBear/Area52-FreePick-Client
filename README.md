@@ -8,6 +8,14 @@ This repository hosts versioned client repair assets in GitHub Releases, never i
 
 Future releases must pin hashes and matching server revisions, preserve effective Area 52 overlays, and be tested before promotion. The inventory tool is read-only preparation and does not approve any file for redistribution. No proprietary client archives belong in Git history.
 
+The channel promotion check compares every `Area52MysticRules` addon file against both the manifest baseline and repair components. This prevents a local leaderboard, certification, or granted-ability repair from being omitted from the tester release and then replaced by an older file during launcher repair. Local installation and tester publication must use the same combined package.
+
+## Hotspot and certification bundle
+
+The October 11 bundle combines the shared built-in XP Hotspots map extension with granted-ability Advancement entries, Mystic Enchant right-click certification, and the four heirloom-ring stat definitions. The certification leaderboard uses 25% background opacity while unhovered and full opacity when hovered. Clicking the Bear Cave icon minimizes or restores it; the preference is saved in the player's settings. The launcher does not distribute or overwrite those personal settings.
+
+The hotspot implementation remains a focused upstream branch pending in-game acceptance. The Area 52 deployment uses the same hotspot client source and server behavior, with realm configuration controlling availability. Publishing this client bundle does not open or merge the upstream PR.
+
 ## Full repair coverage
 
 The published alpha.4 release extends the 86-file baseline to required content data, cinematics, UI assets and Area 52 addons. `tools/prepare_full_client.py` packages the owner-tested client as independently hashed 256 MiB chunks, checks existing baseline hashes and detects source changes during packaging. Launcher 0.3.7 requires complete coverage of every baseline entry. It verifies assembled files before installation and reuses valid chunks after an interruption. Large files and the total baseline are no longer restricted by the legacy ZIP limits. Extra MPQs are quarantined with verified backups rather than left to override tested assets.

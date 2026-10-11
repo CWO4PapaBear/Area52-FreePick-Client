@@ -61,15 +61,51 @@ local function OpenLeaderboard()
         end
         leaderboard:SetScript("OnEnter", HoverBackground)
         leaderboard:SetScript("OnLeave", LeaveBackground)
+        local hoverElapsed = 0
+        leaderboard:SetScript("OnUpdate", function(self, elapsed)
+            hoverElapsed = hoverElapsed + elapsed
+            if hoverElapsed < 0.1 then return end
+            hoverElapsed = 0
+            LeaveBackground()
+        end)
         leaderboard:EnableMouse(true)
         leaderboard:SetMovable(true)
         leaderboard:RegisterForDrag("LeftButton")
         leaderboard:SetScript("OnDragStart", function(self) self:StartMoving() end)
         leaderboard:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-        local icon = leaderboard:CreateTexture(nil, "ARTWORK")
+        local iconButton = CreateFrame("Button", nil, leaderboard)
+        iconButton:SetSize(32, 32)
+        iconButton:SetPoint("TOPLEFT", 12, -12)
+        local icon = iconButton:CreateTexture(nil, "ARTWORK")
         icon:SetSize(32, 32)
-        icon:SetPoint("TOPLEFT", 12, -12)
+        icon:SetAllPoints(iconButton)
         icon:SetTexture("Interface\\Glues\\BearCave\\CertificationIcon")
+        iconButton:SetScript("OnEnter", function(self)
+            HoverBackground()
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(leaderboard.minimized and "Show certification leaderboard" or "Minimize certification leaderboard")
+            GameTooltip:Show()
+        end)
+        iconButton:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+            LeaveBackground()
+        end)
+        iconButton:SetScript("OnClick", function()
+            leaderboard.minimized = not leaderboard.minimized
+            Area52LeaderboardMinimized = leaderboard.minimized
+            for _, region in ipairs({leaderboard:GetRegions()}) do
+                if region:GetObjectType() == "FontString" or region == leaderboard.divider then
+                    if leaderboard.minimized then region:Hide() else region:Show() end
+                end
+            end
+            for _, child in ipairs({leaderboard:GetChildren()}) do
+                if child ~= iconButton then
+                    if leaderboard.minimized then child:Hide() else child:Show() end
+                end
+            end
+            leaderboard:SetSize(leaderboard.minimized and 56 or 245, leaderboard.minimized and 56 or 365)
+            GameTooltip:Hide()
+        end)
         local title = leaderboard:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         title:SetPoint("TOPLEFT", 52, -14)
         title:SetText("THE BEAR CAVE")
@@ -79,6 +115,7 @@ local function OpenLeaderboard()
         help:SetText("Certification Leaderboard")
         help:SetTextColor(169/255, 187/255, 204/255)
         local line = leaderboard:CreateTexture(nil, "ARTWORK")
+        leaderboard.divider = line
         line:SetPoint("TOPLEFT", 12, -56)
         line:SetSize(221, 1)
         line:SetTexture(213/255, 165/255, 70/255, 0.7)
@@ -127,6 +164,7 @@ local function OpenLeaderboard()
         leaderboard.previous = Button("Prev", -70, function() RequestLeaderboard(math.max(1, (leaderboard.page or 1)-1)) end)
         Button("Refresh", 0, function() RequestLeaderboard(leaderboard.page or 1) end)
         leaderboard.next = Button("Next", 70, function() RequestLeaderboard((leaderboard.page or 1)+1) end)
+        if Area52LeaderboardMinimized then iconButton:Click() end
     end
     leaderboard:Show()
     RequestLeaderboard(1)

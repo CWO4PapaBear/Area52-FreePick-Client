@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "c53be087c2d50ab1dd0eee0aa5de147253266be85c4ee6efda2557badf9f3c69",
-  "message": "Level 68-80 heirloom stat scaling improvements."
+  "manifest_sha256": "77a8c09568f259af2387aee36e00297b7d9309e3df55b71c768f808bfee5ab48",
+  "message": "XP hotspots, granted ability certification, heirloom rings, and collapsible leaderboard."
 }

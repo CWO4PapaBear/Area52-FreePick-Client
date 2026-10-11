@@ -31,12 +31,15 @@ if not args.live:
         return fetch(url)
     updater.fetch = candidate_fetch
 manifest = updater.latest("area52")
-relative = "Interface/AddOns/Area52MysticRules/Area52MysticRules.lua"
-source = Path(__file__).resolve().parents[1] / "client" / relative
-expected_hash = hashlib.sha256(source.read_bytes()).hexdigest()
-baseline = next(row for row in manifest["baseline"] if row["path"] == relative)
-component = next(row for group in manifest["components"] for row in group["files"] if row["path"] == relative)
-if baseline["sha256"] != expected_hash or component["sha256"] != expected_hash:
-    raise ValueError("Published Mystic Rules differs from reviewed source; refusing an outdated slot-sorting addon")
+client = Path(__file__).resolve().parents[1] / "client"
+for source in sorted((client / "Interface/AddOns/Area52MysticRules").glob("*")):
+    if not source.is_file():
+        continue
+    relative = source.relative_to(client).as_posix()
+    expected_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+    baseline = next((row for row in manifest["baseline"] if row["path"] == relative), None)
+    component = next((row for group in manifest["components"] for row in group["files"] if row["path"] == relative), None)
+    if not baseline or not component or baseline["sha256"] != expected_hash or component["sha256"] != expected_hash:
+        raise ValueError("Published addon differs from reviewed source: " + relative)
 print("PASS: actual launcher accepted the channel URL, downloaded manifest, checksum, release identity and baseline schema.")
 print(manifest["tag"])
