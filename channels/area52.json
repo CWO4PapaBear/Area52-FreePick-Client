@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "562e7cb1948b8fffb1e0c3e65f796695d496119cac35613d0c8ef986d93ded28",
-  "message": "Classic dungeon updates, Blademaster repairs, and independent Spartan Kick cooldown."
+  "manifest_sha256": "c53be087c2d50ab1dd0eee0aa5de147253266be85c4ee6efda2557badf9f3c69",
+  "message": "Level 68-80 heirloom stat scaling improvements."
 }
