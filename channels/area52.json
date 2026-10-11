@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "23ab346d13deae21a52d4df57b7125badebaa6569e5b68a5b83af8a781887dde",
-  "message": "Hoplite build: 71 VERIFIED entries, linked spell repairs, and explicit Draconic proc chance."
+  "manifest_sha256": "562e7cb1948b8fffb1e0c3e65f796695d496119cac35613d0c8ef986d93ded28",
+  "message": "Classic dungeon updates, Blademaster repairs, and independent Spartan Kick cooldown."
 }
