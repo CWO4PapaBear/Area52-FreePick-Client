@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "77a8c09568f259af2387aee36e00297b7d9309e3df55b71c768f808bfee5ab48",
-  "message": "XP hotspots, granted ability certification, heirloom rings, and collapsible leaderboard."
+  "manifest_sha256": "f3de423c2530b3a6bc38838f77a21b359914e7eea93e7e69322205591ffb9f65",
+  "message": "Hotspot map improvements and Sword and Board / Sword and Thunder repairs."
 }
