@@ -12,10 +12,11 @@ sent = {}; notices = {}; menu = {}; timers = {}; nativeCalls = 0
 function GetRealmName() return realm end
 function UnitName() return "Tester" end
 function GetTime() return clock end
+function IsSpellKnown(id) return id ~= 99 end
 C_Player = { IsHero = function() return hero end }
 BuildCreatorUtil = { IsPickingSpells = function() return picking end }
 C_Timer = { After = function(_, callback) table.insert(timers, callback) end }
-CANCEL = "Cancel"; StaticPopupDialogs = {}; ModTooltipSetSpell = {}
+CANCEL = "Cancel"; StaticPopupDialogs = {}; ModTooltipSetSpell = {}; SlashCmdList = {}
 DEFAULT_CHAT_FRAME = { AddMessage = function(_, message) table.insert(notices, message) end }
 function SendAddonMessage(prefix, payload, channel, who) table.insert(sent, {prefix,payload,channel,who}) end
 function CreateFrame()
@@ -32,6 +33,7 @@ function UIDropDownMenu_Initialize(dropdown, callback) dropdown.initialize = cal
 function CloseDropDownMenus() end
 function StaticPopup_Show(key, name, _, data) popup = {key=key,name=name,data=data} end
 CharacterAdvancement = {
+    HookScript = function() end,
     SpellDropDownMenu = {},
     InitializeSpellDropDown = function() nativeCalls = nativeCalls + 1 end
 }
@@ -40,7 +42,7 @@ function event(...) frame:OnEvent(...) end
 function packet(text, sender, channel) event("CHAT_MSG_ADDON", "A52CERT", text, channel or "WHISPER", sender or "Tester") end
 function open(id)
     menu = {}
-    CharacterAdvancement.SpellDropDownMenu.targetEntry = {ID=id, Name="Test ability"}
+    CharacterAdvancement.SpellDropDownMenu.targetEntry = {ID=id, Name="Test ability", Spells={id}}
     CharacterAdvancement.SpellDropDownMenu.initialize(CharacterAdvancement.SpellDropDownMenu,1)
 end
 ''')

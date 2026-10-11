@@ -6,3 +6,5 @@
 Area52MysticRules.lua
 OutlandAltarPOIs.lua
 TesterCertification.lua
+GrantedAbilityCatalog.lua
+GrantedAbilities.lua

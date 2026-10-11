@@ -51,8 +51,16 @@ local function OpenLeaderboard()
         leaderboard:SetBackdrop({bgFile="Interface\\Buttons\\WHITE8X8",
             edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", tile=true, tileSize=8, edgeSize=12,
             insets={left=3,right=3,top=3,bottom=3}})
-        leaderboard:SetBackdropColor(7/255, 20/255, 34/255, 0.96)
+        leaderboard:SetBackdropColor(7/255, 20/255, 34/255, 0.25)
         leaderboard:SetBackdropBorderColor(213/255, 165/255, 70/255, 1)
+        local function HoverBackground()
+            leaderboard:SetBackdropColor(7/255, 20/255, 34/255, 1)
+        end
+        local function LeaveBackground()
+            leaderboard:SetBackdropColor(7/255, 20/255, 34/255, MouseIsOver(leaderboard) and 1 or 0.25)
+        end
+        leaderboard:SetScript("OnEnter", HoverBackground)
+        leaderboard:SetScript("OnLeave", LeaveBackground)
         leaderboard:EnableMouse(true)
         leaderboard:SetMovable(true)
         leaderboard:RegisterForDrag("LeftButton")
@@ -111,6 +119,8 @@ local function OpenLeaderboard()
             button:SetHighlightFontObject("GameFontHighlightSmall")
             button:SetDisabledFontObject("GameFontDisableSmall")
             button:SetText(text)
+            button:SetScript("OnEnter", HoverBackground)
+            button:SetScript("OnLeave", LeaveBackground)
             button:SetScript("OnClick", action)
             return button
         end
@@ -152,8 +162,12 @@ local function AddCertification(self, dropdown, level)
     if not Active() or not ready or level and level ~= 1 then return end
     if BuildCreatorUtil and BuildCreatorUtil.IsPickingSpells() then return end
     local entry = dropdown.targetEntry
-    if not entry or status[entry.ID] ~= "V" then return end
-    local id, name = entry.ID, entry.Name
+    local id = entry and tonumber(entry.ID)
+    if not id or status[id] ~= "V" then return end
+    local known = false
+    for _, spell in ipairs(entry.Spells or {}) do known = known or IsSpellKnown(spell) end
+    if not known then return end
+    local name = entry.Name
     local info = UIDropDownMenu_CreateInfo()
     info.notCheckable = true
     info.text = "Mark as |cff00ff00CERTIFIED|r"
@@ -166,13 +180,21 @@ local function AddCertification(self, dropdown, level)
 end
 
 local function InstallMenu()
-    if CharacterAdvancement and not CharacterAdvancement.area52CertificationMenu then
-        CharacterAdvancement.area52CertificationMenu = true
-        hooksecurefunc(CharacterAdvancement, "InitializeSpellDropDown", AddCertification)
-        UIDropDownMenu_Initialize(CharacterAdvancement.SpellDropDownMenu, function(...)
-            CharacterAdvancement:InitializeSpellDropDown(...)
+    local owner = CharacterAdvancement
+    if not owner or not owner.SpellDropDownMenu or not owner.InitializeSpellDropDown then return end
+    local function BindMenu()
+        UIDropDownMenu_Initialize(owner.SpellDropDownMenu, function(dropdown, level, menuList)
+            if not (Area52GrantedAbilities and Area52GrantedAbilities.Dropdown(dropdown, level)) then
+                owner:InitializeSpellDropDown(dropdown, level, menuList)
+            end
+            AddCertification(owner, dropdown, level)
         end, "MENU")
     end
+    if not owner.area52CertificationMenu then
+        owner.area52CertificationMenu = true
+        owner:HookScript("OnShow", BindMenu)
+    end
+    BindMenu()
 end
 
 local function ReplaceStatus(tooltip, left, right, spellID)
@@ -280,4 +302,17 @@ SlashCmdList["AREA52CERTIFYMYSTIC"] = function(message)
     if status[id] ~= "V" then Print("That Mystic Enchant is not awaiting certification."); return end
     if pending then Print("Please wait for the current certification request."); return end
     StaticPopup_Show("AREA52_CERTIFY_MYSTIC", GetSpellInfo(spell) or tostring(spell), nil, { id = id })
+end
+
+
+function Area52CertifyMysticEnchant(spellID)
+    SlashCmdList.AREA52CERTIFYMYSTIC(tostring(spellID or ""))
+end
+
+function Area52CanCertifyMysticEnchant(spellID)
+    return Active() and ready and spellID and status[mysticMask + spellID] == "V"
+end
+
+function Area52GetCertificationStatus(id)
+    if Active() and ready then return status[id] end
 end
