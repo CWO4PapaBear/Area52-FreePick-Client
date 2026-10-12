@@ -52,3 +52,12 @@ The release retains the previous manifest as `manifest-before-altars.json`; unch
 
 The October 6 heirloom manifest refresh installs the paired ItemExtendedCost table for Area 52 server source 0b7e7e45a71ef961443a12ff0228f02034b68959. Browse Heirlooms opens Armor, Weapons and Accessories. Armor costs 500 Runes of Ascension; weapons, rings, necklaces and trinkets cost 1000; nine-piece armor caches cost 3600. Purchases require level 60. Added armor XP effects are server-side. The 504-file baseline remains fully covered; only the Area 52 overlay component changed. The new archive and manifest were downloaded and hash-verified before promotion. The previous manifest and assets remain available for rollback. Client visual acceptance remains pending.
 
+
+## Certification eligibility
+
+The certification menu recognizes learned Character Advancement entries as well as directly known
+rank spells. This permits learned passive talents to reach the same VERIFIED-to-CERTIFIED confirmation
+used by abilities, while unearned entries remain excluded. Regression coverage is in
+`tests/certification_ui_checks.py`; it includes learned and unearned passive talents, server acknowledgement,
+realm/build-editor gating, and status updates. Source changes require a matching client release before
+players receive them.

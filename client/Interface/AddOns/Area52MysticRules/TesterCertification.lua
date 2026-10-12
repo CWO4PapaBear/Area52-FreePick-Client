@@ -202,7 +202,8 @@ local function AddCertification(self, dropdown, level)
     local entry = dropdown.targetEntry
     local id = entry and tonumber(entry.ID)
     if not id or status[id] ~= "V" then return end
-    local known = false
+    local known = C_CharacterAdvancement and C_CharacterAdvancement.IsKnownID and
+        C_CharacterAdvancement.IsKnownID(id) or false
     for _, spell in ipairs(entry.Spells or {}) do known = known or IsSpellKnown(spell) end
     if not known then return end
     local name = entry.Name

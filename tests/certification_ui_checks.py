@@ -12,7 +12,7 @@ sent = {}; notices = {}; menu = {}; timers = {}; nativeCalls = 0
 function GetRealmName() return realm end
 function UnitName() return "Tester" end
 function GetTime() return clock end
-function IsSpellKnown(id) return id ~= 99 end
+function IsSpellKnown(id) return id ~= 99 and id ~= 201 and id ~= 202 end
 C_Player = { IsHero = function() return hero end }
 BuildCreatorUtil = { IsPickingSpells = function() return picking end }
 C_Timer = { After = function(_, callback) table.insert(timers, callback) end }
@@ -37,7 +37,7 @@ CharacterAdvancement = {
     SpellDropDownMenu = {},
     InitializeSpellDropDown = function() nativeCalls = nativeCalls + 1 end
 }
-C_CharacterAdvancement = { GetEntryBySpellID = function(id) return {ID=id} end }
+C_CharacterAdvancement = { IsKnownID = function(id) return id == 20 end, GetEntryBySpellID = function(id) return {ID=id} end }
 function event(...) frame:OnEvent(...) end
 function packet(text, sender, channel) event("CHAT_MSG_ADDON", "A52CERT", text, channel or "WHISPER", sender or "Tester") end
 function open(id)
@@ -54,6 +54,16 @@ event("PLAYER_LOGIN")
 assert(#sent == 1 and sent[1][2] == "SYNC" and sent[1][3] == "WHISPER")
 open(10); assert(#menu == 0 and nativeCalls == 1)
 packet("BEGIN"); packet("V|10|11"); packet("C|12"); packet("END")
+packet("V|20|21")
+menu = {}
+CharacterAdvancement.SpellDropDownMenu.targetEntry = {ID=20,Type="Talent",Name="Passive talent",Spells={201,202}}
+CharacterAdvancement.SpellDropDownMenu.initialize(CharacterAdvancement.SpellDropDownMenu,1)
+assert(#menu == 1 and not menu[1].disabled)
+menu[1].func(); assert(popup.data.id == 20 and popup.name == "Passive talent")
+menu = {}
+CharacterAdvancement.SpellDropDownMenu.targetEntry = {ID=21,Type="Talent",Name="Unearned talent",Spells={201,202}}
+CharacterAdvancement.SpellDropDownMenu.initialize(CharacterAdvancement.SpellDropDownMenu,1)
+assert(#menu == 0)
 open(10); assert(#menu == 1 and not menu[1].disabled)
 menu[1].func(); assert(popup.name == "Test ability")
 assert(#sent == 1)
