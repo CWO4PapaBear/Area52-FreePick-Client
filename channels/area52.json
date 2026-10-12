@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "f3de423c2530b3a6bc38838f77a21b359914e7eea93e7e69322205591ffb9f65",
-  "message": "Hotspot map improvements and Sword and Board / Sword and Thunder repairs."
+  "manifest_sha256": "fc7e395c1a9d48d4507cef99f8b3fe6827a829f48f9fe76d11a33166458ebc76",
+  "message": "XP Hotspot GM settings and Orgrimmar training dummies."
 }

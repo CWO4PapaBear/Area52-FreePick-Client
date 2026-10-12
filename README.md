@@ -10,6 +10,20 @@ Future releases must pin hashes and matching server revisions, preserve effectiv
 
 The channel promotion check compares every `Area52MysticRules` addon file against both the manifest baseline and repair components. This prevents a local leaderboard, certification, or granted-ability repair from being omitted from the tester release and then replaced by an older file during launcher repair. Local installation and tester publication must use the same combined package.
 
+## GM hotspot controls and Orgrimmar dummies
+
+The October 11 follow-up pairs hotspot source `2ce74a0f3` and dummy source `b81c5b53f` with the
+Area 52 server build recorded in the manifest. GMs open XP Hotspot Menu from the world map
+magnifying glass. General Settings controls live rotation caps, XP/duration/cooldown defaults,
+and announcements, with an explicit option to apply defaults to existing locations. Clicking a
+hotspot opens its details and marks the selection. Menu titles are realm-neutral.
+
+Two linked six-target formations and a stationary holographic Boss Simulator are available at the
+approved temporary Orgrimmar test sites. Close and reopen the launcher and press Play for the
+matching client. Only `Data/patch-B.MPQ` changes in this client revision; existing overlays and
+certification/leaderboard addon files retain their manifest hashes. Gameplay acceptance and the
+independent upstream PRs remain separate from release validation.
+
 ## Hotspot and certification bundle
 
 The October 11 bundle combines the shared built-in XP Hotspots map extension with granted-ability Advancement entries, Mystic Enchant right-click certification, and the four heirloom-ring stat definitions. The certification leaderboard uses 25% background opacity while unhovered and full opacity when hovered. Clicking the Bear Cave icon minimizes or restores it; the preference is saved in the player's settings. The launcher does not distribute or overwrite those personal settings.
