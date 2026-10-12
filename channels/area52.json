@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "fc7e395c1a9d48d4507cef99f8b3fe6827a829f48f9fe76d11a33166458ebc76",
-  "message": "XP Hotspot GM settings and Orgrimmar training dummies."
+  "manifest_sha256": "bd16af9698ab752f8cab308a51296dc22980f3e87adda3915b80631385f8987f",
+  "message": "Spartan Kick client repair: update before testing Kick."
 }
