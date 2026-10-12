@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "b40135bc1993f75dbd60421fb19d02eca2c471c3d258af19e20be4f0236306bf",
-  "message": "XP Hotspot drawing tools and GM permissions."
+  "manifest_sha256": "83c04088784d438f44e2ccaf582cdfd899f4dc31f4287febe5ba2a892bae78aa",
+  "message": "XP Hotspot painting performance repair."
 }
