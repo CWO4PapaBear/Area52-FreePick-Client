@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "7ab48319af01822676a999eaf0cf98c60daaea7f29f20a0d129ca4963432ad3b",
-  "message": "Bulwark repairs, HERO Dual Wield, transformation models and XP Hotspot map tools."
+  "manifest_sha256": "4f77cef0fa28a3c1938fd2233bd26f0404002e13592bdd89704c5e8ac1d6fc2f",
+  "message": "Vanity incarnation repairs and XP Hotspot map improvements."
 }
