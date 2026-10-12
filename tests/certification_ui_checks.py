@@ -64,6 +64,26 @@ menu = {}
 CharacterAdvancement.SpellDropDownMenu.targetEntry = {ID=21,Type="Talent",Name="Unearned talent",Spells={201,202}}
 CharacterAdvancement.SpellDropDownMenu.initialize(CharacterAdvancement.SpellDropDownMenu,1)
 assert(#menu == 0)
+-- Talent and TalentAbility entries use ownership across one-to-five-rank definitions.
+for _, talentType in ipairs({"Talent", "TalentAbility"}) do
+    for ranks = 1, 5 do
+        local spells = {}
+        for rank = 1, ranks do spells[rank] = 201 end
+        for _, learned in ipairs({true, false}) do
+            local id = learned and 20 or 21
+            menu = {}
+            CharacterAdvancement.SpellDropDownMenu.targetEntry = {
+                ID=id, Type=talentType, Name="Talent ownership regression", Spells=spells
+            }
+            CharacterAdvancement.SpellDropDownMenu.initialize(CharacterAdvancement.SpellDropDownMenu,1)
+            assert(#menu == (learned and 1 or 0), talentType .. " ranks=" .. ranks)
+            if learned then
+                menu[1].func()
+                assert(popup.data.id == id)
+            end
+        end
+    end
+end
 open(10); assert(#menu == 1 and not menu[1].disabled)
 menu[1].func(); assert(popup.name == "Test ability")
 assert(#sent == 1)

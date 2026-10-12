@@ -58,6 +58,7 @@ The October 6 heirloom manifest refresh installs the paired ItemExtendedCost tab
 The certification menu recognizes learned Character Advancement entries as well as directly known
 rank spells. This permits learned passive talents to reach the same VERIFIED-to-CERTIFIED confirmation
 used by abilities, while unearned entries remain excluded. Regression coverage is in
-`tests/certification_ui_checks.py`; it includes learned and unearned passive talents, server acknowledgement,
+`tests/certification_ui_checks.py`; it includes learned and unearned Talent/TalentAbility entries with
+one through five rank definitions, passive talents, server acknowledgement,
 realm/build-editor gating, and status updates. Source changes require a matching client release before
 players receive them.
