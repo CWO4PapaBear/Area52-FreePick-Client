@@ -62,3 +62,16 @@ used by abilities, while unearned entries remain excluded. Regression coverage i
 one through five rank definitions, passive talents, server acknowledgement,
 realm/build-editor gating, and status updates. Source changes require a matching client release before
 players receive them.
+
+## October 12 combined release
+
+The Area 52 channel now pairs the Bulwark build repairs, permanent HERO Dual Wield,
+transformation model restoration and Hotspot manager updates with matching client files.
+The client update includes learned-talent certification eligibility, the granted-ability
+catalog, Bulwark tooltip/spell data and Hotspot map controls. Existing Spartan Kick repair
+bytes are retained. Launcher binaries are unchanged.
+
+The four changed components passed actual launcher staging and assembled-file checks.
+Every reviewed addon file matches the manifest. Channel-contract and Lua certification
+menu checks passed. The combined server build and seven selected regression harnesses
+passed; gameplay certification remains tester-owned.
