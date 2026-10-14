@@ -2,7 +2,10 @@
 
 Run from Windows PowerShell. WSL `dml-arch`, Docker, the existing Area 52 containers,
 and the private Remote GM credentials must already be configured. The wrapper invokes
-WSL as root; it does not put credentials in the package or command line.
+WSL as root; it does not put credentials in the package or command line. For client
+packages, a background Windows job supplies a fresh, activation-specific process-state
+probe throughout the run. Missing, stale or open-client results stop the package even
+when WSL cannot execute Windows binaries. Run the wrapper from Windows PowerShell.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File "PATH\tools\deployment\Activate-Area52.ps1" -Package "PATH\package.json" -CheckOnly
@@ -10,9 +13,11 @@ powershell -ExecutionPolicy Bypass -File "PATH\tools\deployment\Activate-Area52.
 ```
 
 Keep the window open until COMPLETE. Check-only validates artifact hashes, installed
-baselines, client closure when required, and GM connectivity. It does not run package
-hooks, announce, stop, install, or publish. Hook preflight and Docker configuration
-validation also run before the real countdown. A restart-only script does not install
+baselines, client closure when required, and GM connectivity. It does not announce,
+stop, install, or publish. Hook preflight and Docker configuration validation also
+run before the real countdown. Check-only runs each read-only hook
+preflight with the package as its payload; it does not run backup/apply/verify/rollback
+or publication. A restart-only script does not install
 packages.
 
 ## Normal activation

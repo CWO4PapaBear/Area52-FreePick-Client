@@ -10,6 +10,9 @@ import subprocess
 import sys
 import time
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from client_state import ensure_closed
+
 PRIVATE = Path('/home/dml/games/ascension-freepick-test/private')
 COMPOSE = PRIVATE / 'compose.realm.json'
 TRANSACTIONS = PRIVATE / 'deployments'
@@ -120,9 +123,7 @@ def current_binary():
 def client_closed(package):
     if not package['requires_client_closed']:
         return
-    shell = '/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe'
-    execute([shell, '-NoProfile', '-Command',
-             'if (Get-Process Ascension -ErrorAction SilentlyContinue) { exit 2 }'])
+    ensure_closed()
 
 
 def run_step(step, payload, transaction):
@@ -310,7 +311,9 @@ def main():
         gm('server info')
         print('Package integrity and installed baselines passed.', flush=True)
         if args.check_only:
-            print('CHECK ONLY: no announcement, shutdown, installation or publication performed. Hooks run during activation.')
+            for hook in package.get('hooks', []):
+                run_step(hook['preflight'], args.package.parent, TRANSACTIONS / 'check-only')
+            print('CHECK ONLY: hook preflight passed; no announcement, shutdown, installation or publication performed.')
             return
         transaction.mkdir()
         write_state(transaction, 'preparing')
