@@ -1,5 +1,14 @@
 # Client release promotion
 
+## Prepared deployments
+
+Prepare future Area 52 activation packages for `tools/deployment/Activate-Area52.ps1` using
+`docs/DEPLOYMENT-PACKAGES.md`. Include explicit artifact hashes, installed baselines and
+tested rollback steps. Keep binaries, client archives, credentials and private backups
+outside Git. Run the package with `-CheckOnly` before handing it to the owner. Preparing
+a package does not authorize running its live activation. DLL changes remain excluded
+until separately reviewed and approved.
+
 Before every Area 52 channel promotion, run the following against the installed Bear Cave launcher source:
 
 `python tools/verify_channel_promotion.py --launcher ../Bear-Cave-Launcher`
