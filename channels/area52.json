@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "4b88d8d8efd03f6da09a296e915eabdca2a9d1b577ae1c51687184ac71f34459",
-  "message": "Hotspot consolidation, full-zone-only rotation option, active-only map close and delete confirmation fix."
+  "manifest_sha256": "443c8c4973d15e82697d549d0bc0f6f3bf6edd19e1c413c2b31c8df138ee3af7",
+  "message": "Larger GM brush strokes, adaptive boundary smoothing and red painting-limit feedback."
 }
