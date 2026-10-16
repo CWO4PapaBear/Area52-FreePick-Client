@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "273c0d9718b79e191609065491943adead7bd698814562fc767b4184619c668c",
-  "message": "Tap SHIFT to toggle extra tooltip information. No new addon required."
+  "manifest_sha256": "21a4c6e39d33293be811e19d799b832604184a886fcd3beccbe8335acfacfc57",
+  "message": "XP Hotspot painting and window fixes; corrected archetype Primary Stat selection; four evenly spaced stat choices."
 }
