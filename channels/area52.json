@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "feb1d1d7139d536c254efa7a9a946fc6af689eee95cac8cec82c6d022fa643e9",
-  "message": "Mage talent interaction fixes and Power Surge rank tooltips."
+  "manifest_sha256": "273c0d9718b79e191609065491943adead7bd698814562fc767b4184619c668c",
+  "message": "Tap SHIFT to toggle extra tooltip information. No new addon required."
 }
