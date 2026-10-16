@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "21a4c6e39d33293be811e19d799b832604184a886fcd3beccbe8335acfacfc57",
-  "message": "XP Hotspot painting and window fixes; corrected archetype Primary Stat selection; four evenly spaced stat choices."
+  "manifest_sha256": "4b88d8d8efd03f6da09a296e915eabdca2a9d1b577ae1c51687184ac71f34459",
+  "message": "Hotspot consolidation, full-zone-only rotation option, active-only map close and delete confirmation fix."
 }
