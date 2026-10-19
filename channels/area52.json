@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "443c8c4973d15e82697d549d0bc0f6f3bf6edd19e1c413c2b31c8df138ee3af7",
-  "message": "Larger GM brush strokes, adaptive boundary smoothing and red painting-limit feedback."
+  "manifest_sha256": "a36b695564f026c8449bca8097ac004820c4a1d83b51e5ad627dfb2e569535ba",
+  "message": "Power Word: Shield: Verified tooltips and matching shield values for all 14 ranks."
 }
