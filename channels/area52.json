@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "18f36a185cd6680421c638dd7b0406cf2ace3b79b81ddbd8d988534c351ed606",
-  "message": "Epic Druid enchant repairs and Verified tooltips."
+  "manifest_sha256": "bb129c15eb43f04ff316d39d637775294fc8bc508d9f938fe3608273316b0d1b",
+  "message": "Druid control, Clearcasting and Dance of Death corrections."
 }
