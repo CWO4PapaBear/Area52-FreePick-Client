@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "40e046a740fc3198e704282e875f3bbf6a1daef41e0b9af335f32648c8782334",
-  "message": "Mastery member removal preserves your Mastery and refunds only the removed ability."
+  "manifest_sha256": "18f36a185cd6680421c638dd7b0406cf2ace3b79b81ddbd8d988534c351ed606",
+  "message": "Epic Druid enchant repairs and Verified tooltips."
 }
