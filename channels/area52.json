@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "bb129c15eb43f04ff316d39d637775294fc8bc508d9f938fe3608273316b0d1b",
-  "message": "Druid control, Clearcasting and Dance of Death corrections."
+  "manifest_sha256": "0aa3f7f3a7d8ce2fb7d0aca4fc9d7b8bbbeaead887c9fbee27612f60a64e6666",
+  "message": "Prestige now uses the realm level cap."
 }
