@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "0aa3f7f3a7d8ce2fb7d0aca4fc9d7b8bbbeaead887c9fbee27612f60a64e6666",
-  "message": "Prestige now uses the realm level cap."
+  "manifest_sha256": "713b057c6417813e11b3312cc0b79de8a4fef5299498f10ec39a3fe082dd4242",
+  "message": "Warchest opening and vanity ownership corrections."
 }
