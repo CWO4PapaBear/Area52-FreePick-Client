@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "713b057c6417813e11b3312cc0b79de8a4fef5299498f10ec39a3fe082dd4242",
-  "message": "Warchest opening and vanity ownership corrections."
+  "manifest_sha256": "48860b8fe86021f95020a0e446c34bd73830d6dacc77734e6decb8103ad4c229",
+  "message": "Flesh Hook, Deconstruction and Emanating Light verification."
 }
