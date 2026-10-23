@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "48860b8fe86021f95020a0e446c34bd73830d6dacc77734e6decb8103ad4c229",
-  "message": "Flesh Hook, Deconstruction and Emanating Light verification."
+  "manifest_sha256": "230d4d0af9108f208d464012fc15b3620cda060d1449bf7353738adfe191620f",
+  "message": "Warrior stance-bar and combined talent, spell and mount corrections."
 }
