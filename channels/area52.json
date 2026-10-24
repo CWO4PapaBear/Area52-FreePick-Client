@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "c67d810c3bba4e11559e2496c26ed6ce2b24d8367874d233d34afce48b43309b",
-  "message": "First Character Test Boost for Area 52 testing."
+  "manifest_sha256": "caf5af22deb396240ee64154c7726aaef70d55820aea128b7cb5ae6401e22e92",
+  "message": "Area 52 talent and ability verification."
 }
