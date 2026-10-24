@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "e77f7df1101983fb3ecab6bfbffbe05ead1388679cd68dd6d43ef9dda7c3ea65",
-  "message": "Improved Sprint capstone repair and Mastery gem display correction."
+  "manifest_sha256": "c67d810c3bba4e11559e2496c26ed6ce2b24d8367874d233d34afce48b43309b",
+  "message": "First Character Test Boost for Area 52 testing."
 }
