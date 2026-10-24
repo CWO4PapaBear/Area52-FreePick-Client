@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "230d4d0af9108f208d464012fc15b3620cda060d1449bf7353738adfe191620f",
-  "message": "Warrior stance-bar and combined talent, spell and mount corrections."
+  "manifest_sha256": "e82a3131d9b25f5b445b79b6a957b33ce1a29a5936c1b892e13c135de1a03bf8",
+  "message": "Invocation, Fire Totem cost clarity and realm-wide Raid Warning support."
 }
