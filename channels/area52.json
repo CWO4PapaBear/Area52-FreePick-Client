@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "e82a3131d9b25f5b445b79b6a957b33ce1a29a5936c1b892e13c135de1a03bf8",
-  "message": "Invocation, Fire Totem cost clarity and realm-wide Raid Warning support."
+  "manifest_sha256": "e77f7df1101983fb3ecab6bfbffbe05ead1388679cd68dd6d43ef9dda7c3ea65",
+  "message": "Improved Sprint capstone repair and Mastery gem display correction."
 }
