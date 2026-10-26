@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "58e6ed3e14915677ca9a632e089b4edd8390538532a76e21dd124161bd729cc9",
+  "manifest_sha256": "5f828f7c058ee4dda8ce7b7f09bff949544c0f57e9b713f7c3a1f666e6cd851c",
   "message": "Area 52 ability corrections, tooltips and login restoration."
 }
