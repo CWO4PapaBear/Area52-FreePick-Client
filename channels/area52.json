@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "e91a553bc601e0fc2362086cd5bf2fa0d713cc37b5dfd1a23534f3370694f798",
-  "message": "Area 52 Deathbringer corrections."
+  "manifest_sha256": "b0d65de818fc8d14a5b02119d9ccb45fa93923739645b3bc713fa6a91073d441",
+  "message": "Area 52 Exorcist Slash and Crusader Strike corrections."
 }
