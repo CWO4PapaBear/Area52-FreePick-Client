@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "f1e3dad7ca46e73f2795abc7a6fefe20d0166ff71f16579e510fb415f9e79999",
-  "message": "Featured Draft archetypes and internal build sharing."
+  "manifest_sha256": "2dc266576ea19f33a6c58cfb79af0ada719fa5eb06b029aa689764d81b2616c5",
+  "message": "Mystic Enchant and healing repairs."
 }
