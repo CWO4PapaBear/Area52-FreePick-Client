@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "2dc266576ea19f33a6c58cfb79af0ada719fa5eb06b029aa689764d81b2616c5",
-  "message": "Mystic Enchant and healing repairs."
+  "manifest_sha256": "e6349808513fb3595ff24a5af7789e4ed427316fc5a45fd1b0a1a28eb9606ee8",
+  "message": "Bot idle management and Build Architect button backgrounds."
 }
