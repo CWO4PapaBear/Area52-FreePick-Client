@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "f0b52357213d484dfaf083880bab5809eb8eb73072ea55ba8c4df752f86b7221",
-  "message": "Featured build dropdown repair and clearer build validation tooltips."
+  "manifest_sha256": "bb7833b7028b4e0eef93a3b2cb8283eed50329df2181f544cdbe83225e5e2dca",
+  "message": "Character-creation Featured build activation correction."
 }
