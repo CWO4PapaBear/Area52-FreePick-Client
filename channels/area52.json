@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "e6349808513fb3595ff24a5af7789e4ed427316fc5a45fd1b0a1a28eb9606ee8",
-  "message": "Bot idle management and Build Architect button backgrounds."
+  "manifest_sha256": "7d7cff3600abc5cf95c060154ced6eb477c39f21ac44b2a1fd05d80061f46c7c",
+  "message": "Shared Build Library, Save/Publish controls and Featured dropdown correction."
 }
