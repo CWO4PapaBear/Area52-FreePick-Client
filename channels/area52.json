@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "a27ffd741bb82b20616280ac2c297af7b801177ffa0d458067816fe61341f4c7",
-  "message": "Mystic Enchant replacements no longer add duplicate action-bar buttons."
+  "manifest_sha256": "f4ece4d1462ab0084c4b2ffad3925610bd70a9fbe375740b6d0dace3b8d4f060",
+  "message": "Featured Draft publishing correction and detailed build validation diagnostics."
 }
