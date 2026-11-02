@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "4661a6fac1dfcc28beeeffc23038cb18c06248eea6cfc21e2a11e335c3d9b1b1",
-  "message": "Featured Vanity character preview and assigned rewards."
+  "manifest_sha256": "842058f0c285cb1e97b5312b10f4c0ff511a148d14115bd54cab6caf23b3b2bd",
+  "message": "Featured editor native Wardrobe viewport and item import correction."
 }
