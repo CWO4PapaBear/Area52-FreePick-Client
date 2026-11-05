@@ -1,0 +1,313 @@
+diff --git a/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsBaseline.lua b/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsBaseline.lua
+new file mode 100755
+index 0000000..89812f7
+--- /dev/null
++++ b/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsBaseline.lua
+@@ -0,0 +1,218 @@
++Area52StatsBaseline = {}
++local Baseline = Area52StatsBaseline
++
++local function clean(value)
++    return tostring(value or ""):gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
++end
++
++local function add(snapshot, key, name, value, details)
++    snapshot[key] = { name = name, value = clean(value), details = details }
++end
++
++local function readSpellbook()
++    local spells = {}
++    for tab = 1, GetNumSpellTabs() do
++        local _, _, offset, count = GetSpellTabInfo(tab)
++        for slot = offset + 1, offset + count do
++            local name, rank, _, cost, _, power, castTime, minRange, maxRange = GetSpellInfo(slot, BOOKTYPE_SPELL)
++            local id = C_Spell:GetSpellID(slot, BOOKTYPE_SPELL)
++            if name and id and id > 0 then
++                add(spells, "spell/" .. id, name, rank and rank ~= "" and rank or "Learned", {id = id})
++                local prefix = "spellvalue/" .. id .. "/"
++                if type(cost) == "number" then
++                    add(spells, prefix .. "cost/" .. tostring(power), name .. " cost", cost, {id = id})
++                end
++                if type(castTime) == "number" then
++                    add(spells, prefix .. "cast", name .. " cast (ms)", castTime, {id = id})
++                end
++                if type(minRange) == "number" and type(maxRange) == "number" then
++                    add(spells, prefix .. "range", name .. " range (yd)", minRange .. "-" .. maxRange, {id = id})
++                end
++            end
++        end
++    end
++    return spells
++end
++
++local function readAuras(snapshot)
++    for _, filter in ipairs({"HELPFUL", "HARMFUL"}) do
++        local index = 1
++        while true do
++            local name, rank, _, stacks, _, _, _, caster, _, _, id = UnitAura("player", index, filter)
++            if not name then break end
++            local source = caster and UnitGUID(caster) or ""
++            local key = "aura/" .. filter .. "/" .. tostring(id or name) .. "/" .. tostring(source)
++            local copies = snapshot[key] and snapshot[key].count or 0
++            copies = copies + math.max(1, stacks or 0)
++            add(snapshot, key, name, copies, {filter = filter, id = id, caster = source, rank = rank})
++            snapshot[key].count = copies
++            index = index + 1
++        end
++    end
++end
++
++local function readSnapshot(panel)
++    local values, seen = {}, {}
++    local row = panel.baselineReader
++    for _, category in ipairs(panel:GetAppropriateStatCategory()) do
++        for _, stat in ipairs(category.stats) do
++            local key = type(stat) == "table" and stat.key or stat
++            local eligible = type(stat) ~= "table" or
++                ((not stat.classMask or bit.contains(stat.classMask, UnitClassMask("player"))) and
++                 (not stat.minLevel or UnitLevel("player") >= stat.minLevel))
++            if eligible and not seen[key] then
++                seen[key] = true
++                row.Label:SetText("")
++                row.StatText:SetText("")
++                PAPERDOLL_STATINFO[key](row, "player")
++                local label = clean(row.Label:GetText()):gsub(":%s*$", "")
++                if key:match("^MELEE_") or key == "ATTACK_POWER" then
++                    label = "Melee " .. label
++                elseif key:match("^RANGED_") then
++                    label = "Ranged " .. label
++                end
++                add(values, "stat/" .. key, label, row.StatText:GetText())
++            end
++        end
++    end
++    local groups = Enum.StatQueryGroup
++    add(values, "extra/health", "Maximum health", UnitHealthMax("player"))
++    add(values, "extra/mana", "Maximum mana", UnitPowerMax("player", 0))
++    for school = 2, 7 do
++        local label = _G["DAMAGE_SCHOOL" .. (school - 1)] or tostring(school)
++        add(values, "school/power/" .. school, label .. " spell power", GetSpellBonusDamage(school))
++        add(values, "school/crit/" .. school, label .. " spell crit", format("%.2f%%", GetSpellCritChance(school)))
++    end
++    for _, hit in ipairs({{"Melee", CR_HIT_MELEE, groups.MeleeHit}, {"Ranged", CR_HIT_RANGED, groups.RangedHit},
++                          {"Spell", CR_HIT_SPELL, groups.SpellHit}}) do
++        if panel.baselineHitReady[hit[3]] then
++            add(values, "hit/" .. hit[1], hit[1] .. " hit bonus",
++                format("%.2f%%", GetCombatRatingBonus(hit[2]) + CR_DYNAMIC_STATS[hit[3]]))
++        end
++    end
++    local _, offhand = UnitAttackSpeed("player")
++    if offhand and panel.baselineHitReady[groups.MeleeHit] then
++        add(values, "hit/Offhand", "Off-hand hit bonus", format("%.2f%%",
++            GetCombatRatingBonus(CR_HIT_MELEE) + CR_DYNAMIC_STATS[groups.MeleeHit] + CR_DYNAMIC_STATS[groups.OffHandHit]))
++    end
++    readAuras(values)
++    panel.baselineSpells = panel.baselineSpells or readSpellbook()
++    for key, spell in pairs(panel.baselineSpells) do values[key] = spell end
++    return values
++end
++
++local function delta(before, after)
++    local a, unit = before:match("^([+-]?[%d%.]+)(%%?)$")
++    local b, other = after:match("^([+-]?[%d%.]+)(%%?)$")
++    if tonumber(a) and tonumber(b) and unit == other then
++        local change = format("%+.2f", tonumber(b) - tonumber(a)):gsub("0+$", ""):gsub("%.$", "")
++        return change .. (unit == "%" and " pp" or "")
++    end
++    local minA, maxA = before:match("^(%d+)%s*%-%s*(%d+)$")
++    local minB, maxB = after:match("^(%d+)%s*%-%s*(%d+)$")
++    if minA and minB then
++        return format("%+d / %+d", tonumber(minB) - tonumber(minA), tonumber(maxB) - tonumber(maxA))
++    end
++    local leftA, rightA = before:match("^([%d%.]+)%s*/%s*([%d%.]+)$")
++    local leftB, rightB = after:match("^([%d%.]+)%s*/%s*([%d%.]+)$")
++    if leftA and leftB then
++        return format("%+.2f / %+.2f", tonumber(leftB) - tonumber(leftA), tonumber(rightB) - tonumber(rightA))
++    end
++    return "Changed"
++end
++
++function Baseline.Compare(before, after)
++    local changes, keys = {}, {}
++    for key in pairs(before) do keys[key] = true end
++    for key in pairs(after) do keys[key] = true end
++    for key in pairs(keys) do
++        local old, new = before[key], after[key]
++        -- A query that has not returned yet has no comparable percentage.
++        if (old and new or not (key:match("^hit/") or key:match("^spellvalue/"))) and
++           (not old or not new or old.value ~= new.value) then
++            local diff = not old and "Added" or not new and "Removed" or delta(old.value, new.value)
++            local prefix = key:match("^aura/") and "Aura" or key:match("^spell") and "Ability" or "Stat"
++            table.insert(changes, {key = key, name = (new or old).name, change = diff,
++                spell = (new or old).details and (new or old).details.id,
++                info = prefix .. "   " .. (old and old.value or "Absent") .. " → " .. (new and new.value or "Absent")})
++        end
++    end
++    table.sort(changes, function(a, b) return a.name < b.name or a.name == b.name and a.key < b.key end)
++    return changes
++end
++
++function Baseline.Update(panel)
++    local player = panel:GetUnit() == "player"
++    if player and panel.statsBaseline and panel.baselineOwner ~= UnitGUID("player") then
++        panel.statsBaseline = nil
++        panel.baselineSpells = nil
++    end
++    if player then panel.captureStats:Show() else panel.captureStats:Hide() end
++    local group = Enum.StatQueryGroup
++    if panel.baselineHitReady[group.MeleeHit] and panel.baselineHitReady[group.RangedHit] and panel.baselineHitReady[group.SpellHit] then
++        panel.captureStats:Enable()
++        panel.captureStats:SetText("Capture Baseline")
++    else
++        panel.captureStats:Disable()
++        panel.captureStats:SetText("Reading stats…")
++    end
++    if player and panel.statsBaseline then panel.clearStats:Show() else panel.clearStats:Hide() end
++    if not player or not panel.statsBaseline then return false end
++    local changes = Baseline.Compare(panel.statsBaseline, readSnapshot(panel))
++    if #changes == 0 then
++        changes[1] = {name = "No changes", change = "", info = "Compared with your captured baseline."}
++    end
++    for _, item in ipairs(changes) do
++        local entry = item
++        table.insert(panel.sortedStats, function(row)
++            row.Label:SetText(entry.name)
++            row.StatText:SetText(entry.change)
++            row.tooltip = entry.name
++            row.tooltip2 = entry.info
++            if entry.spell then
++                row.onEnterFunc = function(button)
++                    GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
++                    GameTooltip:SetHyperlink("spell:" .. entry.spell)
++                    GameTooltip:AddLine(entry.info, 1, 1, 1, true)
++                    GameTooltip:Show()
++                end
++            end
++        end)
++    end
++    return true
++end
++
++function Baseline.Init(panel)
++    local hidden = CreateFrame("Frame", nil, panel)
++    hidden:Hide()
++    local name = "Area52StatsBaselineReader"
++    local reader = CreateFrame("Frame", name, hidden)
++    reader.Label = reader:CreateFontString(name .. "Label", "ARTWORK", "GameFontNormalSmall")
++    reader.StatText = reader:CreateFontString(name .. "StatText", "ARTWORK", "GameFontNormalSmall")
++    panel.baselineReader = reader
++    panel.baselineHitReady = {}
++    local capture = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
++    capture:SetSize(116, 20)
++    capture:SetPoint("BOTTOMLEFT", panel, "TOPLEFT", 0, 1)
++    capture:SetText("Capture Baseline")
++    capture:Disable()
++    capture:SetScript("OnClick", function()
++        if panel:GetUnit() ~= "player" then return end
++        panel.baselineOwner = UnitGUID("player")
++        panel.baselineSpells = nil
++        panel.statsBaseline = readSnapshot(panel)
++        panel:ScheduleUpdate()
++    end)
++    panel.captureStats = capture
++    local clear = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
++    clear:SetSize(44, 20)
++    clear:SetPoint("LEFT", capture, "RIGHT", 2, 0)
++    clear:SetText("Clear")
++    clear:SetScript("OnClick", function()
++        panel.statsBaseline = nil
++        panel.baselineSpells = nil
++        panel:ScheduleUpdate()
++    end)
++    clear:Hide()
++    panel.clearStats = clear
++end
+diff --git a/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsPanel.lua b/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsPanel.lua
+index d847e38..20854bc 100755
+--- a/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsPanel.lua
++++ b/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsPanel.lua
+@@ -272,6 +272,7 @@ function StatsPanelMixin:OnLoad()
+ 	self.unit = "player"
+ 	
+ 	self.sortedStats = {}
++	Area52StatsBaseline.Init(self)
+ 	self:SetTemplate("StatsPanelStatButtonTemplate")
+ 	self:SetGetNumResultsFunction(function() return #self.sortedStats end)
+ 	self:GetSelectedHighlight():SetTexture()
+@@ -279,8 +280,9 @@ function StatsPanelMixin:OnLoad()
+ end
+ 
+ function StatsPanelMixin:OnShow()
++	self.baselineSpells = nil
++	wipe(self.baselineHitReady)
+ 	self.Background:SetAtlas(GetCharacterFrameSidePanelBackgroundAtlas(self:GetUnit()))
+-	C_Cache:QueryAllStats()
+ 
+ 	self:RegisterEvent("CHARACTER_POINTS_CHANGED")
+ 	self:RegisterEvent("UNIT_LEVEL")
+@@ -325,6 +327,7 @@ function StatsPanelMixin:OnShow()
+ 		self:OnEvent("SPELLS_CHANGED")
+ 	end)
+ 
++	C_Cache:QueryAllStats(true)
+ 	self:ScheduleUpdate()
+ end
+ 
+@@ -348,6 +351,7 @@ function StatsPanelMixin:OnHide()
+ end
+ 
+ function StatsPanelMixin:OnEvent(event, ...)
++	if event ~= "PROCESSED_STATISTIC_QUERY_PAYLOAD" then self.baselineSpells = nil end
+ 	if event == "VARIABLES_LOADED" then
+ 		local orderKey = GetUnitRealmNameKey("player")
+ 		local myCategoryOrder = PAPERDOLL_CATEGORY_ORDERS[orderKey]
+@@ -384,6 +388,7 @@ function StatsPanelMixin:OnEvent(event, ...)
+ 	elseif event == "PROCESSED_STATISTIC_QUERY_PAYLOAD" then
+ 		local queryType, value = ...
+ 		CR_DYNAMIC_STATS[queryType] = value
++		self.baselineHitReady[queryType] = true
+ 	end
+ 	if self:IsVisible() then
+ 		self:ScheduleUpdate()
+@@ -465,6 +470,10 @@ end
+ function StatsPanelMixin:UpdateStats()
+ 	self:SetScript("OnUpdate", nil)
+ 	wipe(self.sortedStats)
++	if Area52StatsBaseline.Update(self) then
++		self:RefreshScrollFrame()
++		return
++	end
+ 	local statCategories = self:GetAppropriateStatCategory()
+ 	local classMask = UnitClassMask(self:GetUnit())
+ 
+diff --git a/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsPanel.xml b/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsPanel.xml
+index 3e8f71d..53ebe28 100755
+--- a/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsPanel.xml
++++ b/Interface/FrameXML/Ascension_CharacterFrame/SidePanels/StatsPanel.xml
+@@ -1,5 +1,6 @@
+ ﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+ https://raw.githubusercontent.com/Ascension-Addons/UI.xsd/main/UI.xsd">
++    <Script file="StatsBaseline.lua"/>
+     <Script file="StatsPanel.lua"/>
+ 
+     <Button name="StatsPanelStatButtonTemplate" inherits="CollapsibleButtonTemplate, ScrollListItemTemplate" virtual="true">
+@@ -89,10 +90,10 @@ https://raw.githubusercontent.com/Ascension-Addons/UI.xsd/main/UI.xsd">
+     </Button>
+     
+     <ScrollFrame name="StatsPanelTemplate" hidden="true" inherits="StandardProportionalScrollListTemplate" virtual="true">
+-        <Size x="162" y="352"/>
++        <Size x="162" y="330"/>
+         
+         <Anchors>
+-            <Anchor point="TOPLEFT" x="2" y="-4"/>
++            <Anchor point="TOPLEFT" x="2" y="-26"/>
+         </Anchors>
+         <Layers>
+             <Layer>
+@@ -117,4 +118,4 @@ https://raw.githubusercontent.com/Ascension-Addons/UI.xsd/main/UI.xsd">
+             </OnLoad>
+         </Scripts>
+     </ScrollFrame>
+-</Ui>
+\ No newline at end of file
++</Ui>
