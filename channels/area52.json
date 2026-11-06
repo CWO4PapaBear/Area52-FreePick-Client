@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "7a9318c1dcd042ce3c9563339c7f07f2968307286ddd09422ad43c8f47359515",
-  "message": "Warrior Stance and Stealth"
+  "manifest_sha256": "2b61c7e4fbb09e46bf91e766a1309c595151d63a493b346094385d165af66fca",
+  "message": "Primary Stat Paths"
 }
