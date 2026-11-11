@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "2d17e850bda3e41f191a9d5b7eefbf4a062427dadd028cc4894b97ac3291d427",
-  "message": "Build Master and Trial Master Rewards"
+  "manifest_sha256": "5ffa62d7878a001f73eb08025a5f47e3c551dbbd95c02538d0d5c10c788321d7",
+  "message": "Dark Ranger and heirloom collection fixes"
 }
