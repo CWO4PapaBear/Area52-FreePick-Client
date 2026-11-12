@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "a6d0506eec763b17ff540c4f31362cbcf9570457d2e3fa66f50b7ef7809811d7",
-  "message": "Featured Build Editor - Character Creation Previews"
+  "manifest_sha256": "f9150197a17e53fa261f7bd40216e853b03d803aa61f671a33a1b2a3eb909ea1",
+  "message": "Build Architect - Preview and Cast List Fixes"
 }
