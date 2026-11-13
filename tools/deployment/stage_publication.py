@@ -44,6 +44,11 @@ def stage(manifest):
     if config.get('client_release'):
         from publish_client_release import validate_inputs
         validate_inputs(root)
+        release_config = root / 'release-config.json'
+        settings = json.loads(release_config.read_text())
+        if settings.get('repo') == 'CWO4PapaBear/Area52-FreePick-Client':
+            settings['launcher'] = 'C:/Users/danie/Documents/Codex/bc316'
+            release_config.write_text(json.dumps(settings, indent=2) + '\n', encoding='utf-8')
     if config.get('source_repo'):
         gh = 'gh' if os.name == 'nt' else '/mnt/c/Program Files/GitHub CLI/gh.exe'
         select_source_branch(config, root, GitHub(gh))

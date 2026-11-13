@@ -79,22 +79,66 @@ def reconcile_assets(records, remote, upload):
             raise RuntimeError('Uploaded asset readback differs: ' + name)
 
 
-def check_release_capacity(api, repo, tag, required):
+def release_inventory(api, repo, tag):
     from urllib.parse import quote
     release = api.api(f'repos/{repo}/releases/tags/{quote(tag, safe="")}')
-    names = set()
+    names = {}
     for page in range(1, 12):
         rows = api.api(f"repos/{repo}/releases/{release['id']}/assets?per_page=100&page={page}")
         for row in rows:
             if row['name'] in names:
                 raise RuntimeError('Release inventory changed during capacity check')
-            names.add(row['name'])
+            names[row['name']] = row
         if len(rows) < 100:
             break
-    missing = required - names
+    return names
+
+
+class ReleaseFull(RuntimeError):
+    pass
+
+
+def check_release_capacity(api, repo, tag, required):
+    names = release_inventory(api, repo, tag)
+    missing = required - names.keys()
     if len(names) + len(missing) > 1000:
-        raise RuntimeError(f'Release {tag} has {len(names)} assets and needs {len(missing)} new slots. '
+        raise ReleaseFull(f'Release {tag} has {len(names)} assets and needs {len(missing)} new slots. '
                            'Prepare a new release tag before deployment.')
+
+
+def rollover_manifest(api, repo, baseline, manifest, local, identity):
+    from copy import deepcopy
+    version = 'roll-' + sha(identity.encode())[:20]
+    tag = 'area52-' + version
+    root = f'https://github.com/{repo}/releases/download/'
+    result = deepcopy(manifest)
+    result.update(version=version, tag=tag, notes_url=root+tag+'/PATCH-NOTES.md', minimum_launcher_build=316)
+    old = {(c['asset'], c['sha256'], c['bytes']): c for part in baseline['components'] for c in part['chunks']}
+    inventories = {}
+    uploads = set()
+    for part in result['components']:
+        for chunk in part['chunks']:
+            name = chunk['asset']
+            source = old.get((name, chunk['sha256'], chunk['bytes']), chunk)
+            source_tag = source['url'].split('/')[-2]
+            if not re.fullmatch(r'area52-[A-Za-z0-9][A-Za-z0-9._-]{0,70}', source_tag) or source['url'] != root+source_tag+'/'+name:
+                raise RuntimeError('Invalid source chunk location')
+            if source_tag not in inventories:
+                inventories[source_tag] = release_inventory(api, repo, source_tag)
+            row = inventories[source_tag].get(name)
+            if row:
+                if row.get('size') != chunk['bytes'] or row.get('digest') != 'sha256:'+chunk['sha256']:
+                    raise RuntimeError('Source release chunk differs: '+name)
+                chunk['url'] = source['url']
+            else:
+                path = local / name
+                if not path.is_file() or path.stat().st_size != chunk['bytes'] or sha(path.read_bytes()) != chunk['sha256']:
+                    raise RuntimeError('Missing verified source for chunk: '+name)
+                uploads.add(name)
+                chunk['url'] = root+tag+'/'+name
+    if len(uploads)+2 > 1000:
+        raise RuntimeError('New payload exceeds single release capacity')
+    return result, uploads
 
 
 def execute(root, tx, phase):
@@ -134,8 +178,6 @@ def execute_locked(root, tx, phase):
     if json.loads(pointer)['manifest_sha256'] != sha((release / 'manifest.json').read_bytes()):
         raise RuntimeError('Candidate pointer differs from manifest')
     published, _ = api.file(repo, 'channels/area52.json')
-    if published not in ((baseline / 'area52.json').read_bytes(), pointer):
-        raise RuntimeError('Public channel changed; reconcile before publication')
     if not api.api(f'repos/{repo}').get('permissions', {}).get('push'):
         raise RuntimeError('Client repository write access unavailable')
 
@@ -156,11 +198,51 @@ def execute_locked(root, tx, phase):
     required = {p.name for p in release.glob('*.bin')}
     for name in ('manifest.json', 'PATCH-NOTES.md'):
         required.update((name, 'before-' + config['id'] + '-' + name))
-    check_release_capacity(api, repo, tag, required)
+    rolled = False
+    selected = {p.name for p in release.glob('*.bin')}
+    try:
+        check_release_capacity(api, repo, tag, required)
+    except ReleaseFull:
+        manifest, selected = rollover_manifest(api, repo, json.loads((baseline/'manifest.json').read_bytes()),
+                                               manifest, release, config['id'])
+        fullclient.validate(manifest, repo)
+        rolled = True
+        tag = manifest['tag']
+        prepared = tx/'publication'/'rollover'
+        if phase == 'preflight':
+            temporary = tempfile.TemporaryDirectory()
+            prepared = Path(temporary.name)
+        prepared.mkdir(parents=True, exist_ok=True)
+        import shutil
+        for name in selected | {'PATCH-NOTES.md'}:
+            shutil.copyfile(release/name, prepared/name)
+        release = prepared
+        save(release/'manifest.json', manifest)
+        channel = json.loads(pointer)
+        channel.update(manifest_url=manifest['notes_url'].rsplit('/',1)[0]+'/manifest.json',
+                       manifest_sha256=sha((release/'manifest.json').read_bytes()))
+        save(release/'area52.json', channel)
+        pointer = (release/'area52.json').read_bytes()
+    if published not in ((baseline/'area52.json').read_bytes(), pointer):
+        raise RuntimeError('Public channel changed; reconcile before publication')
+    if rolled:
+        endpoint = f'repos/{repo}/releases'
+        existing = api.api(endpoint+'/tags/'+tag, missing=True)
+        marker = 'Area 52 client rollover for '+config['id']
+        if existing and existing.get('body') != marker:
+            raise RuntimeError('Release tag belongs to another publication')
+        if not existing and phase == 'publish':
+            intent = tx/'publication'/'create-rollover.json'
+            if intent.exists():
+                raise RuntimeError('Unresolved release creation intent; reconcile before retry')
+            save(intent, dict(tag=tag, repo=repo))
+            api.api(endpoint, dict(tag_name=tag, name=tag, body=marker, make_latest='false'))
     previous = sha((baseline / 'manifest.json').read_bytes())
     candidate = sha((release / 'manifest.json').read_bytes())
-    if remote('manifest.json') not in (previous, candidate):
+    if not rolled and remote('manifest.json') not in (previous, candidate):
         raise RuntimeError('Canonical manifest changed; reconcile before publication')
+    if rolled and existing and remote('manifest.json') not in (None, candidate):
+        raise RuntimeError('Rollover canonical manifest differs')
     for component in manifest['components']:
         for chunk in component['chunks']:
             local = release / chunk['asset']
@@ -182,7 +264,7 @@ def execute_locked(root, tx, phase):
         gh('release', 'upload', tag, str(path), *(['--clobber'] if exists else []))
 
     backups = []
-    for name in ('manifest.json', 'PATCH-NOTES.md'):
+    for name in (() if rolled else ('manifest.json', 'PATCH-NOTES.md')):
         backup_name = 'before-' + config['id'] + '-' + name
         backup = tx / 'publication' / 'client-backups' / backup_name
         backup.parent.mkdir(parents=True, exist_ok=True)
@@ -193,7 +275,7 @@ def execute_locked(root, tx, phase):
             raise RuntimeError('Client baseline backup differs')
         backups.append((backup_name, backup, False))
     reconcile_assets(backups, remote, upload)
-    chunks = [(p.name, p, False) for p in sorted(release.glob('*.bin'))]
+    chunks = [(name, release/name, False) for name in sorted(selected)]
     reconcile_assets(chunks, remote, upload)
     reconcile_assets([(n, release / n, True) for n in ('PATCH-NOTES.md', 'manifest.json')], remote, upload)
     state['assets_verified'] = True
