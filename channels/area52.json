@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "d09e185cfd619ca5d010b0ff4bc056d1b568502f77f06379beb536f748732e6a",
-  "message": "Beast whistles and Wardrobe pet filters"
+  "manifest_sha256": "01660e7fd83f04d5595cc2d18b1690d6ad3208231f47fe5b14a9554da679ea5b",
+  "message": "Worldforged pickup placements and Dark Rootbound Beast"
 }
