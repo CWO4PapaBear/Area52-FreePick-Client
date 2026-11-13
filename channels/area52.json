@@ -3,7 +3,7 @@
   "channel": "area52",
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
-  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "ab95ac6f61a74bb2f09a27ff339dc1637d5ec8f373f431c3edab01ecd8c5abf9",
-  "message": "Wardrobe Beast and Rootbound rider corrections"
+  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-roll-d29cd3e8c8728e640d37/manifest.json",
+  "manifest_sha256": "ecdefd982e05d833c3c3f91bea6717084b67cf9ec5f686e3c52b21743650f230",
+  "message": "Shadow Waste Bolt and Beast filter"
 }
