@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-0.1.0-alpha.4/manifest.json",
-  "manifest_sha256": "60f59a860fb8e447abcd13e0e9dd29621439cbe416366424e14d82d02ff2f02a",
-  "message": "Wardrobe Beast corrections"
+  "manifest_sha256": "ab95ac6f61a74bb2f09a27ff339dc1637d5ec8f373f431c3edab01ecd8c5abf9",
+  "message": "Wardrobe Beast and Rootbound rider corrections"
 }
