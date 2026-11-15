@@ -4,6 +4,6 @@
   "name": "Area 52 - Free Pick Alpha Dev",
   "enabled": true,
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-roll-d29cd3e8c8728e640d37/manifest.json",
-  "manifest_sha256": "e50510fb450fc72a62a6175c01f5f26d3bb24a6a98457c5afb35c0b6a4f3a0af",
-  "message": "Fused Sanctuary tooltip scaling"
+  "manifest_sha256": "0fe0b15eb9a6e28287f3e99c28887ce3cefccfed69f562900be5eea6603e816f",
+  "message": "Roothound Shadow Bite tooltip"
 }
