@@ -6,6 +6,14 @@ $ErrorActionPreference = 'Stop'
 $packagePath = (Resolve-Path -LiteralPath $Package).Path
 $runnerPath = Join-Path $PSScriptRoot 'activate.py'
 $manifest = Get-Content -LiteralPath $packagePath -Raw | ConvertFrom-Json
+if ($manifest.target -eq 'cloud') {
+    $cloudPython = 'C:\Users\danie\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+    $cloudArguments = @((Join-Path $PSScriptRoot 'cloud_transport.py'), $packagePath)
+    if ($CheckOnly) { $cloudArguments += '--check-only' }
+    & $cloudPython @cloudArguments
+    if ($LASTEXITCODE -ne 0) { throw 'Cloud activation or preflight did not complete. Review its retained transaction before retrying.' }
+    return
+}
 if ($manifest.requires_client_closed -and (Get-Process Ascension -ErrorAction SilentlyContinue)) {
     throw 'Close Ascension before running this package.'
 }
