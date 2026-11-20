@@ -3,7 +3,7 @@
   "channel": "area52",
   "name": "Area 52 - Free Pick Alpha Test",
   "enabled": true,
-  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-roll-d29cd3e8c8728e640d37/manifest.json",
-  "manifest_sha256": "8fb540ddca89f1fd6a8df844319563c1fba7e3fef57c611d48f1c7e8d8be348e",
-  "message": "Area 52 \u2014 Cache Rewards Upgraded"
+  "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-catalog-c076ed4d43d591ce81c54a7bca2cce7c/manifest.json",
+  "manifest_sha256": "495591c472afb8be13737c8c8e44ac93f569805bb3df30a4d0f98f3474998aa6",
+  "message": "Featured Build catalog updated."
 }
