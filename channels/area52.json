@@ -1,9 +1,9 @@
 {
   "channel": "area52",
   "enabled": true,
-  "manifest_sha256": "a17835053c7a8da8d9cff54d4cbfff870383f8acb9ec7a3ce5694d66c6b01e3d",
+  "manifest_sha256": "463e8ada3677ad6af1b7f8ae7fc7258c9eb03074551f2946b0620c138530ab06",
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-catalog-16292a047e3938cff4a331bb23ee9fd6/manifest.json",
-  "message": "Featured Build catalog updated.",
+  "message": "Area 52 \u2014 Development repair bundle",
   "name": "Area 52 - Free Pick Alpha Test",
   "schema": 1
 }
