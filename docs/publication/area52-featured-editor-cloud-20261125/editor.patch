@@ -1,0 +1,621 @@
+--- a/interface/addons/ascension_buildcreator/buildcreator.lua
++++ b/interface/addons/ascension_buildcreator/buildcreator.lua
+@@ -318,12 +318,49 @@
+ 	return filters
+ end
+ 
++-- BuildCreator's native filter boundary consumes numeric argument/sort IDs.
++-- Keep named keys in the widgets for labels, checked state and mutual exclusion.
++local function BuildCreatorNativeSelections(selected, sorting)
++    local ids = sorting and {
++        SORT_NONE=0, SORT_RATING_ASCENDING=1, SORT_RATING_DESCENDING=2,
++        SORT_DATE_ASCENDING=3, SORT_DATE_DESCENDING=4,
++    } or {
++        FILTER_FEATURED=1, FILTER_DIFFICULTY_RATING_EASY=2,
++        FILTER_DIFFICULTY_RATING_NORMAL=3, FILTER_DIFFICULTY_RATING_HARD=4,
++        FILTER_DIFFICULTY_RATING_VERY_HARD=5, FILTER_DIFFICULTY_RATING_IMPOSSIBLE=6,
++        FILTER_OWNED_BUILDS=7, FILTER_PRIMARY_STAT_STRENGTH=8,
++        FILTER_PRIMARY_STAT_AGILITY=9, FILTER_PRIMARY_STAT_INTELLECT=10,
++        FILTER_PRIMARY_STAT_SPIRIT=11, FILTER_ROLE_TANK=12,
++        FILTER_ROLE_HEALER=13, FILTER_ROLE_DAMAGE=14, FILTER_LAST_30_DAYS=15,
++    }
++    local aliases = {DEATH_KNIGHT="DEATHKNIGHT", KNIGHT_OF_XOROTH="FLESHWARDEN",
++        FILTER_CLASS_KNIGHT_OF_XOROTH="FLESHWARDEN", VENOMANCER="PROPHET",
++        PRIMALIST="WILDWALKER", SUN_CLERIC="SUNCLERIC"}
++    local converted = {}
++    for key, enabled in pairs(selected or {}) do
++        local id = type(key)=="number" and key or ids[key]
++        if not id and not sorting and type(key)=="string" then
++            local class = string.match(key, "^FILTER_CLASS_(.+)$")
++            local classID = class and Enum.Class[aliases[class] or class]
++            if classID and classID>=1 and classID<=32 then id=classID+15 end
++        end
++        if id and type(enabled)=="boolean" then converted[id]=enabled end
++    end
++    return converted
++end
++
++function BuildCreatorMixin:UpdateNativeFilter(text)
++    C_BuildCreator.UpdateFilter(text,
++        BuildCreatorNativeSelections(self:ApplyDefaultClassFilter(), false),
++        BuildCreatorNativeSelections(self.sort, true))
++end
++
+ function BuildCreatorMixin:UpdateSearch()
+ 	self.Sorting.ClearFiltersButton:SetShown(not self.sort[Enum.BuildSort.RatingDescending])
+ 	if self.BuildScroll:IsVisible() then
+ 		local text = self.SearchBox:GetText()
+ 		
+-		C_BuildCreator.UpdateFilter(text, self:ApplyDefaultClassFilter(), self.sort)
++		self:UpdateNativeFilter(text)
+ 		self.BuildScroll:RefreshScrollFrame()
+ 	end
+ end
+@@ -736,7 +773,7 @@
+ function BuildCreatorMixin:BUILD_CREATOR_CATEGORY_RESULT(category)
+ 	self:HideLoading()
+ 	self.SearchBox:SetText("")
+-	C_BuildCreator.UpdateFilter("", self:ApplyDefaultClassFilter(), self.sort)
++	self:UpdateNativeFilter("")
+ 	self.category = category
+ 	self:ShowBuildList()
+ 	self.BuildScroll:RefreshScrollFrame()
+--- a/interface/addons/ascension_buildcreator/buildeditor/editablebuildview.lua
++++ b/interface/addons/ascension_buildcreator/buildeditor/editablebuildview.lua
+@@ -1143,6 +1143,20 @@
+     F.PickerBar:Show()
+ end
+ 
++function F.DressPreview(view,model,visibility)
++    local key=table.concat({view.Area52FeaturedGeneration or 0,visibility or 0,table.concat(view.Area52FeaturedItems or {},",")},":")
++    if model.Area52EquipmentKey==key then return end
++    model.Area52EquipmentKey=key
++    AppearancePlayerModelMixin.InternalUndress(model)
++    for slot=1,12 do
++        local item=view.Area52FeaturedItems and view.Area52FeaturedItems[slot]
++        local hidden=(slot==10 or slot==11) and (visibility==2 or visibility==3)
++            or slot==12 and (visibility==1 or visibility==3)
++        if item and item>0 and not hidden then model:TryOn(item) end
++    end
++    return true
++end
++
+ function F.Refresh(view,skipQuery)
+     local panel=view.Area52VanitySection
+     local items=view.Area52FeaturedItems
+@@ -1151,7 +1165,12 @@
+     view.Area52PreviewSerial=(view.Area52PreviewSerial or 0)+1
+     local serial=view.Area52PreviewSerial
+     local missing={}
+-    AppearancePlayerModelMixin.Dress(panel.Model)
++    F.DressPreview(view,panel.Model,0)
++    local scene=view.Area52PreviewSection and view.Area52PreviewSection.scene
++    if scene and not scene.deadlines[1] and F.DressPreview(view,scene.actor,view.Area52WeaponVisibility or 0) then
++        scene.actor:StopSequence()
++        scene.actor:PlaySequence(scene.pose or 0,true)
++    end
+     for slot,definition in ipairs(F.Slots) do
+         local id=items[slot] or 0
+         local itemName=id>0 and GetItemInfo(id)
+@@ -1171,40 +1190,72 @@
+         view.Area52PreviewCancel=ItemQueryListener:AddCancelableCallback(missing,function()
+             if view.Area52PreviewSerial~=serial then return end
+             view.Area52PreviewCancel=nil
++            panel.Model.Area52EquipmentKey=nil
++            local scene=view.Area52PreviewSection and view.Area52PreviewSection.scene
++            if scene then scene.actor.Area52EquipmentKey=nil end
+             F.Refresh(view,true)
+         end)
+     end
+ end
+ 
+--- Model widgets use screen-space viewports on this client. Keep the model
+--- outside the scroll child and give it only the visible part of its layout slot.
++function F.EnsurePreviewWindow(view)
++    if view.Area52PreviewWindow then return view.Area52PreviewWindow end
++    local window=CreateFrame("Frame",nil,UIParent)
++    view.Area52PreviewWindow=window
++    window:SetSize(780,650);window:SetPoint("CENTER",UIParent,"CENTER",0,0)
++    window:SetFrameStrata("FULLSCREEN_DIALOG");window:SetFrameLevel(100);window:EnableMouse(true)
++    window:SetToplevel(true);window:SetMovable(true);window:SetClampedToScreen(true)
++    local drag=CreateFrame("Frame",nil,window)
++    window.DragHandle=drag
++    drag:SetPoint("TOPLEFT",8,-5);drag:SetPoint("TOPRIGHT",-38,-5);drag:SetHeight(29)
++    drag:EnableMouse(true);drag:RegisterForDrag("LeftButton")
++    drag:SetScript("OnDragStart",function()window:Raise();window:StartMoving()end)
++    drag:SetScript("OnDragStop",function()window:StopMovingOrSizing()end)
++    window:SetBackdrop({bgFile="Interface\\FrameGeneral\\UI-Background-Rock2",edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",edgeSize=16,insets={left=4,right=4,top=4,bottom=4}})
++    window:SetBackdropColor(0.12,0.12,0.12,1)
++    local title=window:CreateFontString(nil,"OVERLAY","GameFontNormalLarge")
++    title:SetPoint("TOP",0,-15);title:SetText("Featured Build Preview")
++    window.Vanity=CreateFrame("Frame",nil,window);window.Vanity:SetSize(744,560);window.Vanity:SetPoint("TOPLEFT",18,-70)
++    window.Animation=CreateFrame("Frame",nil,window);window.Animation:SetSize(744,560);window.Animation:SetPoint("TOPLEFT",18,-70)
++    function window:SelectTab(tab)
++        self.tab=tab;self.Vanity:SetShown(tab==1);self.Animation:SetShown(tab==2)
++        if view.CastVisualPicker then view.CastVisualPicker:Hide() end
++    end
++    for i,text in ipairs({"Vanity rewards","Animation scene"}) do
++        local tab=i
++        local button=CreateFrame("Button",nil,window,"UIPanelButtonTemplate")
++        button:SetSize(160,24);button:SetPoint("TOPLEFT",20+(i-1)*170,-40);button:SetText(text)
++        button:SetScript("OnClick",function()window:SelectTab(tab)end)
++    end
++    local close=CreateFrame("Button",nil,window,"UIPanelCloseButton")
++    close:SetPoint("TOPRIGHT",-3,-3);close:SetScript("OnClick",function()window:Hide()end)
++    window:HookScript("OnHide",function()window:StopMovingOrSizing();if view.CastVisualPicker then view.CastVisualPicker:Hide() end end)
++    view:HookScript("OnHide",function()window:Hide()end)
++    function window:Open(tab)
++        if not F.Applies() then return end
++        local width=UIParent:GetWidth();local height=UIParent:GetHeight()
++        self:SetScale(math.min(1,math.max(0.1,(width-40)/780),math.max(0.1,(height-40)/650)))
++        self:SelectTab(tab or self.tab or 1);self:Show();self:Raise()
++        F.Refresh(view);if F.RefreshPreviewControls then F.RefreshPreviewControls(view) end
++    end
++    window:SelectTab(1);window:Hide()
++    return window
++end
++
++local function previewButton(view,section,tab)
++    local button=CreateFrame("Button",nil,section,"UIPanelButtonTemplate")
++    button:SetSize(180,24);button:SetPoint("TOPLEFT",58,-42);button:SetText("Preview Scene")
++    button:SetScript("OnClick",function()F.EnsurePreviewWindow(view):Open(tab)end)
++    section.PreviewButton=button
++end
++
+ local function attachPreviewModel(view, section, slot, kind)
+-    local scroll=view.MainFrame.ScrollFrame
+-    local model=CreateFrame(kind,nil,scroll)
+-    local last={}
++    local model=CreateFrame(kind,nil,slot)
++    model:SetAllPoints(slot)
+     local function sync()
+-        if not section:IsVisible() or not slot:IsVisible() then model:Hide();return end
+-        local l,b,w,h=slot:GetLeft(),slot:GetBottom(),slot:GetWidth(),slot:GetHeight()
+-        local x,y,sw,sh=scroll:GetLeft(),scroll:GetBottom(),scroll:GetWidth(),scroll:GetHeight()
+-        if not (l and b and w and h and x and y and sw and sh) then model:Hide();return end
+-        local ratio=slot:GetEffectiveScale()/scroll:GetEffectiveScale()
+-        local left=math.max(0,l*ratio-x)
+-        local right=math.min(sw,(l+w)*ratio-x)
+-        local bottom=math.max(0,b*ratio-y)
+-        local top=math.min(sh,(b+h)*ratio-y)
+-        if right<=left or top<=bottom then model:Hide();return end
+-        local width,height=right-left,top-bottom
+-        if last.x~=left or last.y~=bottom or last.w~=width or last.h~=height then
+-            model:ClearAllPoints();model:SetPoint("BOTTOMLEFT",scroll,"BOTTOMLEFT",left,bottom)
+-            model:SetSize(width,height)
+-            last.x,last.y,last.w,last.h=left,bottom,width,height
+-        end
+-        model:Show()
+-    end
+-    section:HookScript("OnUpdate",sync)
+-    section:HookScript("OnHide",function()model:Hide()end)
+-    slot:HookScript("OnHide",function()model:Hide()end)
+-    model:Hide()
++        model:SetShown(not (view.CastVisualPicker and view.CastVisualPicker:IsShown()))
++    end
++    F.EnsurePreviewWindow(view):HookScript("OnUpdate",sync)
+     return model
+ end
+ 
+@@ -1222,10 +1273,11 @@
+     local panel=CreateFrame("Frame",view:GetName().."Area52Vanity",content,"EditableBuildViewSectionTemplate")
+     local scroll=view.MainFrame.ScrollFrame
+     local scale=math.min(1,math.max(0.25,(scroll:GetHeight()-76)/538))
+-    panel:SetSize(764,76+538*scale);panel:SetCategory("AREA52_FEATURED_VANITY");panel.Area52FeaturedOnly=true
++    panel:SetSize(764,80);panel:SetCategory("AREA52_FEATURED_VANITY");panel.Area52FeaturedOnly=true
+     panel.Serialize=function() return nil end;panel.Deserialize=function() end
+-    local canvas=CreateFrame("Frame",nil,panel)
+-    canvas:SetSize(380,538);canvas:SetScale(scale);canvas:SetPoint("TOP",panel,"TOP",0,-44/scale)
++    local canvas=CreateFrame("Frame",nil,F.EnsurePreviewWindow(view).Vanity)
++    canvas:SetSize(380,538);canvas:SetPoint("TOPLEFT",80,-8)
++    previewButton(view,panel,1)
+     panel.Canvas=canvas
+     panel.Model=attachPreviewModel(view,panel,canvas,"DressUpModel")
+     local model=panel.Model
+@@ -1237,6 +1289,7 @@
+     model:SetEnableDragRotation(true);model:SetEnableScrollZoom(true);model:SetEnableDragMove(true)
+     model:SetDragScale(0.001);model:SetMaxPosOffset(0.2,0.18);model:SetMinMaxDistance(-1,1)
+     model:SetUnit("player");model:SetCamera(1)
++    model:HookScript("OnShow",function() model.Area52EquipmentKey=nil;F.Refresh(view) end)
+     model.categoryID=1
+     model.InternalUndress=AppearancePlayerModelMixin.InternalUndress
+     model.GetSlotIllusionDisplayID=function() return 0 end
+@@ -1271,14 +1324,15 @@
+         label:SetPoint("TOP",button,"BOTTOM",0,-2);label:SetText(tostring(F.Slots[slot][2]))
+         panel.Buttons[slot]=button
+     end
+-    local full=Button(panel,"Choose full armor set",210,function() F.OpenPicker(view,0) end)
+-    full:SetPoint("BOTTOMLEFT",panel,"BOTTOMLEFT",110,8)
+-    local assigned=Button(panel,"Load archetype set",180,function()
++    local full=Button(F.EnsurePreviewWindow(view).Vanity,"Choose full armor set",210,function() F.OpenPicker(view,0) end)
++    full:SetPoint("TOPLEFT",F.EnsurePreviewWindow(view).Vanity,"TOPLEFT",482,-300)
++    local assigned=Button(F.EnsurePreviewWindow(view).Vanity,"Load archetype set",210,function()
+         F.ImportAssigned(view,true);view:UpdatePendingBuild()
+     end)
+-    assigned:SetPoint("LEFT",full,"RIGHT",12,0)
+-    local help=panel:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall")
+-    help:SetPoint("TOP",panel,"TOP",0,-28);help:SetText("Hover for item details. Left-click to choose; right-click to clear.")
++    assigned:SetPoint("TOPLEFT",full,"BOTTOMLEFT",0,-12)
++    panel.FullSetButton=full;panel.ArchetypeSetButton=assigned
++    local help=F.EnsurePreviewWindow(view).Vanity:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall")
++    help:SetPoint("BOTTOM",F.EnsurePreviewWindow(view).Vanity,"BOTTOM",0,0);help:SetText("Hover for item details. Left-click to choose; right-click to clear.")
+     local mounts=canvas:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall")
+     mounts:SetPoint("TOPLEFT",canvas,"TOPLEFT",402,-30);mounts:SetText("Mounts")
+     local ordered={}
+@@ -3562,6 +3616,12 @@
+     if GetRealmName()~="Area 52 - Free-Pick" then return end
+     local build=C_BuildEditor.GetPendingBuild()
+     if deserialize or view.Area52PreviewBuild~=build.ID or not view.Area52PreviewEffects then
++        local description=build.Description or ""
++        local marker="###AREA52_FEATURED_WEAPONS\n"
++        local _,count=description:gsub(marker,"")
++        local value=description:match("###AREA52_FEATURED_WEAPONS\n1:([0-3])\n") or description:match("###AREA52_FEATURED_WEAPONS\n1:([0-3])$")
++        view.Area52WeaponVisibility=tonumber(value) or 0
++        view.Area52WeaponVisibilityInvalid=count>1 or (count==1 and not value)
+         view.Area52PreviewEffects=F.ReadPreview(build.Description)
+         view.Area52PreviewInvalid=not view.Area52PreviewEffects
+         view.Area52PreviewEffects=view.Area52PreviewEffects or {0,0,0,0}
+@@ -3604,6 +3664,10 @@
+ function Area52DraftSelector.Description(view,description)
+     description=(description or ""):gsub("\n*###AREA52_FEATURED_PREVIEW[^#]*","")
+     description=description:gsub("\n*###AREA52_FEATURED_INCARNATIONS[^#]*","")
++    description=description:gsub("\n*###AREA52_FEATURED_WEAPONS[^#]*","")
++    if F.Applies() then
++        description=description.."\n\n###AREA52_FEATURED_WEAPONS\n1:"..tostring(view.Area52WeaponVisibility or 0)
++    end
+     if F.Applies() and view.Area52PreviewEffects then
+         local effects=view.Area52PreviewEffects
+         description=description.."\n\n###AREA52_FEATURED_PREVIEW\n1:"..table.concat({effects[1],4294967295,effects[3],effects[4]},",")
+@@ -3614,7 +3678,7 @@
+ local previousValidate=Area52CanPublishBuild
+ function Area52CanPublishBuild(view)
+     if F.Applies() and view.Area52ImportPending then return false,{"Archetype items are still loading. Wait before saving."} end
+-    if F.Applies() and view.Area52PreviewInvalid then return false,{"Invalid Character Creation preview settings. Reopen an intact saved build."} end
++    if F.Applies() and (view.Area52PreviewInvalid or view.Area52WeaponVisibilityInvalid) then return false,{"Invalid Character Creation preview settings. Reopen an intact saved build."} end
+     return previousValidate(view)
+ end
+ local previousReason=Area52BuildPublishReason
+@@ -3758,7 +3822,7 @@
+         if seen[key] or #raw%2~=0 then return end
+         local found=false
+         for _,s in ipairs(defaults) do if s[1]==key then found=true end end
+-        if not found then return end
++        if not found and not GetSpellInfo(key) then return end
+         seen[key]=true
+         rows[#rows+1]={id=key,level=level,text=(raw:gsub("..",function(pair)return string.char(tonumber(pair,16)) end))}
+     end
+@@ -3820,6 +3884,121 @@
+     return priorReason(reason)
+ end
+ BUILDCREATOR_SECTION_AREA52_CREATION_SUMMARY="Character Creation Summary"
++-- Summary selection is presentation metadata, never a spell-learning action.
++function Summary.choices(view, all)
++    local choices,seen={},{}
++    local function add(id,level)
++        if type(id)~="number" or id<=0 or seen[id] then return end
++        local name=GetSpellInfo(id)
++        if not name then return end
++        seen[id]=true;choices[#choices+1]={id=id,name=name,level=level}
++    end
++    for _,spell in ipairs(C_BuildEditor.GetPendingBuild().Spells or {}) do add(spell.Spell,spell.Level) end
++    for _,row in ipairs(view.SummaryRows or {}) do add(row.id,tonumber(row.level)) end
++    if all and C_CharacterAdvancement.GetAllEntries then
++        for _,entry in ipairs(C_CharacterAdvancement.GetAllEntries()) do
++            local flags=entry.Flags or 0
++            local enums=Enum.CharacterAdvancementFlag
++            if enums and not bit.contains(flags,enums.Disabled) and not bit.contains(flags,enums.Deprecated) then
++                for _,id in ipairs(entry.Spells or {}) do add(id) end
++            end
++        end
++    end
++    table.sort(choices,function(a,b)if a.name==b.name then return a.id<b.id end;return a.name<b.name end)
++    return choices
++end
++local function summaryTooltip(button)
++    if not button.spellID then return end
++    GameTooltip:SetOwner(button,"ANCHOR_RIGHT")
++    GameTooltip:SetHyperlink("spell:"..button.spellID)
++    GameTooltip:Show()
++end
++function Summary.pick(view,index)
++    if not F.Applies() or not view.SummaryRows or not view.SummaryRows[index] then return end
++    local picker=view.SummaryPicker
++    if not picker then
++        picker=CreateFrame("Frame",nil,view);view.SummaryPicker=picker
++        picker:SetSize(490,390);picker:SetPoint("CENTER",view,"CENTER",0,0)
++        picker:SetFrameStrata("TOOLTIP");picker:SetFrameLevel(200);picker:EnableMouse(true)
++        picker:SetBackdrop({bgFile="Interface\\Buttons\\WHITE8X8",edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",edgeSize=14})
++        picker:SetBackdropColor(0.055,0.045,0.035,1)
++        local title=picker:CreateFontString(nil,"OVERLAY","GameFontNormal")
++        title:SetPoint("TOPLEFT",16,-14);title:SetText("Choose summary ability")
++        local close=CreateFrame("Button",nil,picker,"UIPanelCloseButton")
++        close:SetPoint("TOPRIGHT",-2,-2);close:SetScript("OnClick",function()picker:Hide()end)
++        picker.search=CreateFrame("EditBox",nil,picker,"InputBoxTemplate")
++        picker.search:SetSize(270,22);picker.search:SetPoint("TOPLEFT",20,-42);picker.search:SetAutoFocus(false)
++        picker.search:SetScript("OnEscapePressed",function()picker:Hide()end)
++        picker.scope=CreateFrame("Button",nil,picker,"UIPanelButtonTemplate")
++        picker.scope:SetSize(170,24);picker.scope:SetPoint("TOPLEFT",300,-42)
++        picker.scope:SetScript("OnClick",function()picker.all=not picker.all;picker:Refresh()end)
++        picker.rows={}
++        function picker:Valid()
++            return F.Applies() and self.generation==view.Area52FeaturedGeneration and self.ownerRows==view.SummaryRows
++                and self.selectedRow==view.SummaryRows[self.index]
++        end
++        function picker:Choose(id)
++            if not self:Valid() then self:Hide();return end
++            local selected
++            for _,choice in ipairs(self.choices) do if choice.id==id then selected=choice;break end end
++            if not selected then return end
++            for n,row in ipairs(view.SummaryRows) do if n~=self.index and row.id==id then return end end
++            local row=self.selectedRow
++            if row.id~=id then
++                row.id=id
++                -- Do not silently attach the previous ability's description to the new spell.
++                row.text=""
++                if selected.level then row.level=tostring(math.max(1,math.min(80,selected.level))) end
++            end
++            self:Hide();view:UpdatePendingBuild()
++        end
++        function picker:Draw(first)
++            self.first=math.max(1,math.min(self.maximum,math.floor(first)))
++            for n,button in ipairs(self.rows) do
++                local choice=self.filtered[self.first+n-1]
++                button:SetShown(choice~=nil);button.spellID=choice and choice.id
++                if choice then
++                    local _,_,icon=GetSpellInfo(choice.id)
++                    button:SetText("|T"..(icon or "Interface\\Icons\\INV_Misc_QuestionMark")..":24|t "..choice.name)
++                    local used=false
++                    for i,row in ipairs(view.SummaryRows or {}) do if i~=self.index and row.id==choice.id then used=true end end
++                    if used then button:Disable() else button:Enable() end
++                end
++            end
++        end
++        function picker:Refresh()
++            if not self:Valid() then self:Hide();return end
++            self.choices=Summary.choices(view,self.all);self.filtered={}
++            local query=(self.search:GetText() or ""):lower()
++            for _,choice in ipairs(self.choices) do
++                if choice.name:lower():find(query,1,true) or tostring(choice.id)==query then self.filtered[#self.filtered+1]=choice end
++            end
++            self.scope:SetText(self.all and "Character Advancement" or "Build abilities")
++            self.maximum=math.max(1,#self.filtered-8)
++            self.slider:SetMinMaxValues(1,self.maximum);self.slider:SetValue(1)
++            self.slider:SetShown(self.maximum>1);self:Draw(1)
++        end
++        for i=1,9 do
++            local button=CreateFrame("Button",nil,picker,"UIPanelButtonTemplate")
++            picker.rows[i]=button;button:SetSize(435,30);button:SetPoint("TOPLEFT",16,-76-(i-1)*33)
++            button:SetScript("OnEnter",summaryTooltip);button:SetScript("OnLeave",function()GameTooltip:Hide()end)
++            button:SetScript("OnClick",function(self)picker:Choose(self.spellID)end)
++        end
++        picker.slider=CreateFrame("Slider",view:GetName().."SummaryPickerScroll",picker,"UIPanelScrollBarTemplate")
++        picker.slider:SetPoint("TOPRIGHT",-14,-92);picker.slider:SetPoint("BOTTOMRIGHT",-14,25)
++        picker.slider:SetValueStep(1);picker.slider:SetScript("OnValueChanged",function(_,v)if picker.filtered then picker:Draw(v)end end)
++        picker:EnableMouseWheel(true);picker:SetScript("OnMouseWheel",function(_,delta)
++            picker.slider:SetValue(math.max(1,math.min(picker.maximum,picker.first-delta*3)))
++        end)
++        picker.search:SetScript("OnTextChanged",function(_,user)if user then picker:Refresh()end end)
++        view:HookScript("OnHide",function()picker:Hide()end)
++        picker:SetScript("OnHide",function()picker.search:ClearFocus();GameTooltip:Hide()end)
++    end
++    picker.generation=view.Area52FeaturedGeneration;picker.ownerRows=view.SummaryRows
++    picker.index=index;picker.selectedRow=view.SummaryRows[index]
++    picker.search:SetText("");picker:Refresh();picker:Show()
++end
++
+ function Summary.show(view)
+     local content=view.MainFrame.ScrollFrame.Content
+     local panel=view.SummaryPanel
+@@ -3835,9 +4014,15 @@
+         for i=1,5 do
+             local index=i
+             local line=CreateFrame("Frame",nil,panel);panel.rows[i]=line
+-            line:SetSize(720,90);line:SetPoint("TOPLEFT",20,-40-(i-1)*94)
++            line:SetSize(720,76);line:SetPoint("TOPLEFT",20,-40-(i-1)*80)
+             line.name=line:CreateFontString(nil,"OVERLAY","GameFontNormal")
+-            line.name:SetPoint("TOPLEFT",0,0)
++            line.name:SetPoint("TOPLEFT",44,0)
++            line.icon=CreateFrame("Button",nil,line)
++            line.icon:SetSize(34,34);line.icon:SetPoint("TOPLEFT",0,0)
++            line.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")
++            line.icon:SetScript("OnClick",function()Summary.pick(view,index)end)
++            line.icon:SetScript("OnEnter",summaryTooltip)
++            line.icon:SetScript("OnLeave",function()GameTooltip:Hide()end)
+             local label=line:CreateFontString(nil,"OVERLAY","GameFontNormalSmall")
+             label:SetPoint("TOPLEFT",270,0);label:SetText("Unlock level")
+             local function field(width,height,x,y,key)
+@@ -3852,7 +4037,10 @@
+                 box:SetScript("OnEscapePressed",function(self)self:ClearFocus()end)
+                 return box
+             end
+-            line.level=field(46,22,356,4,"level");line.text=field(670,62,8,-24,"text")
++            line.level=field(46,22,356,4,"level");line.text=field(606,42,44,-24,"text")
++            line.text:SetTextInsets(5,5,4,4)
++            line.text:SetBackdrop({bgFile="Interface\\Buttons\\WHITE8X8",edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",edgeSize=8})
++            line.text:SetBackdropColor(0.025,0.025,0.025,0.8)
+             local function move(delta,x,title)
+                 local b=CreateFrame("Button",nil,line,"UIPanelButtonTemplate")
+                 b:SetSize(65,22);b:SetPoint("TOPLEFT",x,4);b:SetText(title)
+@@ -3868,13 +4056,17 @@
+         end
+     end
+     local rows=view.SummaryRows or {}
+-    panel:SetHeight(50+94*#rows);panel:Show()
++    panel:SetHeight(50+80*#rows);panel:Show()
++    if view.SummaryPicker and not view.SummaryPicker:Valid() then view.SummaryPicker:Hide() end
+     panel:ClearAllPoints();panel:SetPoint("TOPLEFT",view.Area52PreviewSection,"BOTTOMLEFT",0,-16)
+     content.Consumables:ClearAllPoints();content.Consumables:SetPoint("TOPLEFT",panel,"BOTTOMLEFT",0,-16)
+     for i,line in ipairs(panel.rows) do
+         local row=rows[i];line:SetShown(row~=nil)
+         if row then
+             line.name:SetText(GetSpellInfo(row.id) or tostring(row.id))
++            local _,_,icon=GetSpellInfo(row.id)
++            line.icon.spellID=row.id
++            line.icon:SetNormalTexture(icon or "Interface\\Icons\\INV_Misc_QuestionMark")
+             if line.level:GetText()~=row.level then line.level:SetText(row.level) end
+             if line.text:GetText()~=row.text then line.text:SetText(row.text) end
+             if i>1 then line.up:Enable() else line.up:Disable() end
+@@ -3897,14 +4089,14 @@
+ local function castSelector(view,parent,index,title)
+     local button=CreateFrame("Button",nil,parent,"UIPanelButtonTemplate")
+     button:SetSize(212,24)
+-    button:SetPoint("TOPLEFT",parent,"TOPLEFT",309,-46-(index-1)*60)
++    button:SetPoint("TOPLEFT",parent,"TOPLEFT",460,-46-(index-1)*60)
+     local function open()
+         local picker=view.CastVisualPicker
+         if not picker then
+-            picker=CreateFrame("Frame",nil,view)
++            picker=CreateFrame("Frame",nil,F.EnsurePreviewWindow(view))
+             view.CastVisualPicker=picker
+-            picker:SetPoint("CENTER",view,"CENTER",0,0)
+-            picker:SetFrameStrata("DIALOG");picker:EnableMouse(true)
++            picker:SetPoint("CENTER",F.EnsurePreviewWindow(view),"CENTER",0,0)
++            picker:SetFrameStrata("TOOLTIP");picker:SetFrameLevel(F.EnsurePreviewWindow(view):GetFrameLevel()+100);picker:EnableMouse(true)
+             picker:SetBackdrop({bgFile="Interface\\Buttons\\WHITE8X8",edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",edgeSize=14})
+             picker:SetBackdropColor(0.055,0.045,0.035,1)
+             picker.heading=picker:CreateFontString(nil,"OVERLAY","GameFontNormal")
+@@ -3961,6 +4153,9 @@
+         for i,entry in ipairs(picker.options) do if entry.id==picker.selected then first=math.min(i,picker.maximum);break end end
+         picker.slider:SetMinMaxValues(1,picker.maximum);picker.slider:SetValue(first)
+         picker.slider:SetShown(picker.maximum>1);picker.draw(first);picker:Show()
++        view.Area52VanitySection.Model:Hide()
++        view.Area52PreviewSection.scene.actor:Hide()
++        view.Area52PreviewSection.scene.pet:Hide()
+     end
+     button:SetScript("OnClick",open)
+     function button:SetCastChoices(choices,current,callback)
+@@ -4003,12 +4198,7 @@
+     if index==1 then
+         local model=scene.actor
+         model:StopSequence()
+-        model:SetUnit("player")
+-        model:Undress()
+-        for slot=1,12 do
+-            local item=scene.view.Area52FeaturedItems[slot]
+-            if item and item>0 then model:TryOn(item) end
+-        end
++        F.DressPreview(scene.view,model,scene.view.Area52WeaponVisibility or 0)
+         pose(scene)
+     else
+         local pet=scene.pet
+@@ -4064,28 +4254,53 @@
+     return true
+ end
+ function F.CreateScene(view,panel)
+-    panel:SetHeight(248)
+-    local scene={view=view,deadlines={}};panel.scene=scene
++    local section=panel
++    section:SetHeight(80);previewButton(view,section,2)
++    panel=F.EnsurePreviewWindow(view).Animation
++    local scene={view=view,deadlines={},host=panel};panel.scene=scene;section.scene=scene
+     local canvas=CreateFrame("Frame",nil,panel)
+-    canvas:SetSize(280,184);canvas:SetPoint("TOPLEFT",panel,"TOPLEFT",12,-42)
++    canvas:SetSize(430,480);canvas:SetPoint("TOPLEFT",panel,"TOPLEFT",12,-42)
+     scene.canvas=canvas
+     local background=canvas:CreateTexture(nil,"BACKGROUND")
+     background:SetAllPoints();background:SetAtlas(AppearanceUtil.GetBackgroundAtlas())
+     local actorSlot=CreateFrame("Frame",nil,canvas)
+-    actorSlot:SetSize(184,180);actorSlot:SetPoint("BOTTOMLEFT",canvas,"BOTTOMLEFT",0,0)
++    actorSlot:SetSize(300,460);actorSlot:SetPoint("BOTTOMLEFT",canvas,"BOTTOMLEFT",0,0)
+     local petSlot=CreateFrame("Frame",nil,canvas)
+-    petSlot:SetSize(96,104);petSlot:SetPoint("BOTTOMRIGHT",canvas,"BOTTOMRIGHT",0,0)
++    petSlot:SetSize(130,200);petSlot:SetPoint("BOTTOMRIGHT",canvas,"BOTTOMRIGHT",0,0)
+     scene.actor=attachPreviewModel(view,panel,actorSlot,"DressUpModel")
++    scene.actor:HookScript("OnShow",function()
++        if not view.Area52FeaturedItems then return end
++        local active=scene.deadlines[1]
++        scene.actor.Area52EquipmentKey=nil
++        F.DressPreview(view,scene.actor,view.Area52WeaponVisibility or 0)
++        if active then
++            scene.actor:StopSequence()
++            scene.actor:SetSpell(view.Area52PreviewEffects[3],0)
++        else pose(scene) end
++    end)
+     scene.petSlot=petSlot
+     scene.pet=attachPreviewModel(view,panel,petSlot,"DressUpModel")
++    for _,model in ipairs({scene.actor,scene.pet}) do
++        Mixin(model,ModelMixin)
++        ModelMixin.OnLoad(model)
++        model:SetEnableDragRotation(true)
++        model:SetEnableDragMove(false)
++        model:SetEnableScrollZoom(false)
++        model.PostUpdate=function(self)
++            if self.facing then self:SetFacing(self.facing) end
++        end
++    end
++    scene.actor:SetCamera(1)
++    local hint=panel:CreateFontString(nil,"OVERLAY","GameFontHighlightSmall")
++    hint:SetPoint("TOPLEFT",12,-532);hint:SetText("Left-drag a model to rotate. Drag the title bar to move this window.")
+     local base=view:GetName().."FeaturedScene"
+     scene.drops={}
+-    for i,title in ipairs({"Character cast visual","Pet cast visual","Editor stance"}) do
+-        label(panel,title,310,-30-(i-1)*60)
+-        if i<=2 then scene.drops[i]=castSelector(view,panel,i,title) else scene.drops[i]=dropdown(panel,base.."Menu"..i,290,-44-(i-1)*60) end
++    for i,title in ipairs({"Character cast visual","Pet cast visual","Editor stance","Weapons shown in Character Creation"}) do
++        label(panel,title,460,-30-(i-1)*60)
++        scene.drops[i]=castSelector(view,panel,i,title)
+     end
+     local replay=CreateFrame("Button",nil,panel,"UIPanelButtonTemplate")
+-    scene.replay=replay;replay:SetSize(98,24);replay:SetPoint("TOPLEFT",550,-48);replay:SetText("Replay")
++    scene.replay=replay;replay:SetSize(98,24);replay:SetPoint("TOPLEFT",460,-305);replay:SetText("Replay")
+     replay:SetScript("OnClick",function()play(scene)end)
+     for i,model in ipairs({scene.actor,scene.pet}) do
+         local index=i
+@@ -4093,7 +4308,7 @@
+             if scene.deadlines[index] then idle(scene,index) end
+         end)
+     end
+-    panel:HookScript("OnUpdate",function(_,elapsed)
++    section:HookScript("OnUpdate",function(_,elapsed)
+         for i=1,2 do
+             if scene.deadlines[i] then
+                 scene.deadlines[i]=scene.deadlines[i]-elapsed
+@@ -4157,10 +4372,16 @@
+     end
+     local choices={}
+     for _,p in ipairs(poses) do choices[#choices+1]={id=p[1],name=p[2]} end
+-    menu(scene.drops[3],choices,scene.pose or 0,function(id)
++    scene.drops[3]:SetCastChoices(choices,scene.pose or 0,function(id)
+         if not F.ValidContext(ctx) then return end
+         scene.pose=id;idle(scene,1)
+-        for _,p in ipairs(poses) do if p[1]==id then UIDropDownMenu_SetText(scene.drops[3],p[2]);break end end
++        F.RefreshPreviewControls(view)
++    end)
++    scene.drops[4]:SetCastChoices({{id=0,name="All assigned weapons"},{id=1,name="Melee / off-hand only"},{id=2,name="Ranged only"},{id=3,name="None"}},view.Area52WeaponVisibility or 0,function(id)
++        if not F.ValidContext(ctx) then return end
++        view.Area52WeaponVisibility=id
++        view.Area52WeaponVisibilityInvalid=false
++        view:UpdatePendingBuild()
+     end)
+     for idx,btn in pairs(scene.icons) do
+         local id=e[idx]
+@@ -4181,6 +4402,17 @@
+         btn.Icon:SetDesaturated(effective==0);btn.NoItemTexture:SetShown(effective==0)
+         btn.rewardName=(id==DEFAULT and "Archetype default: " or "")..(name or (effective==0 and "None" or tostring(effective)))
+     end
+-    local key=table.concat({view.Area52FeaturedGeneration or 0,archetype or 0,scene.petID,e[3],e[4],table.concat(view.Area52FeaturedItems,",")},":")
++    local key=table.concat({view.Area52FeaturedGeneration or 0,archetype or 0,scene.petID,e[3],e[4],view.Area52WeaponVisibility or 0,table.concat(view.Area52FeaturedItems,",")},":")
+     if key~=scene.key then scene.key=key;play(scene) end
+ end
++
++local fixedPreviewBefore=F.Before
++function F.Before(view,deserialize)
++    local previous=view.Area52FeaturedGeneration
++    fixedPreviewBefore(view,deserialize)
++    if view.Area52PreviewWindow and previous~=view.Area52FeaturedGeneration then
++        view.Area52PreviewWindow:Hide()
++        local scene=view.Area52PreviewSection and view.Area52PreviewSection.scene
++        if scene then scene.pose=0;scene.key=nil;F.RefreshPreviewControls(view) end
++    end
++end
+--- a/interface/framexml/util/buildcreatorutil.lua
++++ b/interface/framexml/util/buildcreatorutil.lua
+@@ -102,7 +102,7 @@
+ 
+ local function Area52VisibleDescription(description)
+     if GetRealmName() ~= "Area 52 - Free-Pick" then return description end
+-    for _,key in ipairs({"ARCHETYPE_ID","FEATURED_VANITY","FEATURED_IMPORTED","FEATURED_PREVIEW","FEATURED_INCARNATIONS","CREATION_SUMMARY"}) do
++    for _,key in ipairs({"ARCHETYPE_ID","FEATURED_VANITY","FEATURED_IMPORTED","FEATURED_PREVIEW","FEATURED_INCARNATIONS","CREATION_SUMMARY","FEATURED_WEAPONS"}) do
+         description=description:gsub("\n*###AREA52_"..key.."[^#]*","")
+     end
+     return description

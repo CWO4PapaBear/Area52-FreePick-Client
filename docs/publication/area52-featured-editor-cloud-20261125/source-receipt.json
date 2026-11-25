@@ -1,0 +1,25 @@
+{
+  "package": "area52-featured-editor-cloud-20261125",
+  "server_pr": "https://github.com/CWO4PapaBear/azerothcore-wotlk-coa/pull/121",
+  "client_feed_commit": "e0809799bbde3c861ae50f6b0e692270f99e8aed",
+  "patch_sha256": "779c8e6cf30583edbacbda90989a9229e0c44a7fbb771888dc75398fbb239e1a",
+  "archive_sha256": "8adfe539bc849252d9624a04c7193fc6cfc1c4aa0f5c396d2d7573fb7a0ada64",
+  "members": [
+    {
+      "member": "interface\\addons\\ascension_buildcreator\\buildcreator.lua",
+      "cloud": "151b554324adfbdabc4e964ebc89af7e2abd0f941ff399cb2f78f417274abbd5",
+      "development": "fdb181eb72d57e5d488962c68c44b0729c50c000dab373d190c661d2dfe31b4b"
+    },
+    {
+      "member": "interface\\addons\\ascension_buildcreator\\buildeditor\\editablebuildview.lua",
+      "cloud": "2ad418db73c903a8025d9a19166cdbf4b0c5a2b18d2065e333a81d59547fafe2",
+      "development": "35d9f7b598d8b0d2329cb1b84b1b140f1a68790416df27b52ddf2d886f2cec32"
+    },
+    {
+      "member": "interface\\framexml\\util\\buildcreatorutil.lua",
+      "cloud": "db41a8602d7f04e31fd92f08fb9db00c0435cbbeb6fa36370b9095926f0c50bd",
+      "development": "c6d40f3026fd9c7662833b83a7ee9cdef9911007011290e336e987fa4afbff5f"
+    }
+  ],
+  "verification": "Patch applied offline to all three exact archived baselines and matched normalized candidate source. UI regression suite and live launcher delivery passed. No proprietary archives are committed."
+}
