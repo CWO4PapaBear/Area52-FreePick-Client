@@ -1,0 +1,13 @@
+{
+  "status": "source text staged; archive and launcher staging pending",
+  "spells": {
+    "997082": {
+      "expected_description": "@req:403@\n@req:8232@\nTransforms Lightning Bolt into |cFFFFFFFFDesolate Wind Bolt|r. \n\nTriggering Windfury causes a |cFFFFFFFFDesoalte Dust Devil|r to surround your target and grants you stack of |cFFFFFFFFDesolate Winds|r.\n\nDoes not work with Elemental Destruction.\n@s:997083:0@\n@s:997084:0@\n@s:300065:0@\n@wflocation:Become the Hero of a clan before betraying them.@",
+      "description": "@req:403@\n@req:8232@\nTransforms Lightning Bolt into |cFFFFFFFFDesolate Wind Bolt|r. \n\nTriggering Windfury causes a |cFFFFFFFFDesolate Dust Devil|r to surround your target and grants you a stack of |cFFFFFFFFDesolate Winds|r.\n\nDesolate Dust Devil lasts 8 seconds. Each landed Desolate Wind Bolt extends your existing Desolate Dust Devil by 2 seconds, up to a maximum of 12 seconds remaining. Extending it does not reset its damage tick timer.\n\nDoes not work with Elemental Destruction.\n@s:997083:0@\n@s:997084:0@\n@s:300065:0@\n@wflocation:Become the Hero of a clan before betraying them.@"
+    },
+    "300065": {
+      "expected_description": "Deals Nature damage over $t seconds. \n\nYour Desolate Wind Bolt extends the duration of this effect.",
+      "description": "Deals Nature damage every 2 seconds for 8 seconds.\n\nEach landed Desolate Wind Bolt extends your existing Desolate Dust Devil by 2 seconds, up to a maximum of 12 seconds remaining. Extending it does not reset its damage tick timer."
+    }
+  }
+}
