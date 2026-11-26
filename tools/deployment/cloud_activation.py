@@ -1,4 +1,5 @@
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -81,7 +82,7 @@ def validate(package, payload):
         targets.add(str(target))
     require(package['runner_sha256'] == digest(__file__), 'Cloud runner changed; requalify package')
     columns = r'`[A-Za-z0-9_]+`(?:,`[A-Za-z0-9_]+`)*'
-    tables = r'(?:spell_script_names|spell_proc|spell_dbc|spell_group|spell_group_stack_rules|item_template|quest_template|quest_template_addon|item_loot_template)'
+    tables = r'(?:spell_script_names|spell_proc|spell_dbc|spell_group|spell_group_stack_rules|item_template|quest_template|quest_template_addon|item_loot_template|acore_playerbots\.(?:playerbots_legendary_class|playerbots_legendary_weight|playerbots_custom_strategy|playerbots_legendary_pick|playerbots_legendary_enchant))'
     pattern = r'SELECT JSON_ARRAY\(' + columns + r'\) FROM ' + tables
     literal = r"(?:-?[0-9]+|'[A-Za-z0-9_-]+')"
     term = r'[A-Za-z0-9_]+\s*(?:=\s*' + literal + r'|IN\s*\(' + literal + r'(?:,\s*' + literal + r')*\))'
@@ -119,6 +120,8 @@ def check_deployment_target(package):
 
 def preflight(package, payload):
     validate(package, payload)
+    require(os.access(payload / package['binary'], os.X_OK),
+            'Cloud candidate binary is not executable; repair staged file permissions before activation')
     client_closed(package)
     for item in package.get('client_replacements', []):
         require(digest(item['target']) == item['before_sha256'], 'Local client archive drift')
@@ -133,15 +136,74 @@ def preflight(package, payload):
         require(path.resolve().is_relative_to((ROOT / 'etc').resolve()), 'Invalid configuration guard')
         require(digest(path) == item['sha256'], 'Cloud configuration drift')
     require(readback(package) == package['before_rows_sha256'], 'Cloud database rows changed')
+    check_certification_file()
     check_deployment_target(package)
+    require(isinstance(package.get('announcement'), str) and
+            1 <= len(package['announcement']) <= 180 and
+            not any(ord(c) < 32 or c == '|' for c in package['announcement']),
+            'Cloud shutdown requires a short plain-text repair reason')
+    gm('server info')
     print('Cloud-only integrity, binary, configuration, status and SQL preflight passed.', flush=True)
     return current
+
+
+def check_certification_file():
+    text = (ROOT / 'etc/worldserver.conf').read_text()
+    enabled = re.findall(r'(?m)^CoA\.FreePick\.TesterCertification\s*=\s*(\d+)\s*$', text)
+    require(len(enabled) <= 1, 'Duplicate certification enable settings')
+    if enabled != ['1']:
+        return
+    paths = re.findall(r'(?m)^CoA\.FreePick\.CertificationFile\s*=\s*"([^"\r\n]+)"\s*$', text)
+    require(len(paths) == 1 and paths[0].startswith('/'), 'Certification ledger path is missing or ambiguous')
+    try:
+        command(['docker', 'exec', WORLD, 'test', '-f', paths[0]])
+        command(['docker', 'exec', WORLD, 'test', '-r', paths[0]])
+    except RuntimeError as error:
+        raise RuntimeError('Certification is enabled but its ledger is unavailable inside Cloud worldserver') from error
 
 
 def client_closed(package):
     if package.get('requires_client_closed'):
         from client_state import ensure_closed
         ensure_closed()
+
+
+def gm(text):
+    path = ROOT / 'control/cloud_gm.py'
+    require(path.is_file() and path.stat().st_uid == 0 and not path.stat().st_mode & 0o022,
+            'Cloud command helper must be root-owned and protected')
+    spec = importlib.util.spec_from_file_location('area52_cloud_gm', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.execute(text)
+
+
+def shutdown_notice(package, current):
+    online = sql('SELECT COUNT(*) FROM acore_characters.characters WHERE online <> 0;').decode().strip()
+    require(online.isdecimal(), 'Cloud online population could not be established')
+    restart = current['HostConfig'].get('RestartPolicy', {}).get('Name', 'no')
+    command(['docker', 'update', '--restart', 'no', WORLD])
+    try:
+        if int(online) == 0:
+            command(['docker', 'stop', '--time', '60', WORLD])
+            require(not inspect(WORLD)['State']['Running'], 'Empty Cloud worldserver did not stop')
+            return
+        gm('announce Server restart in 3 minutes: ' + package['announcement'])
+        started = time.monotonic()
+        gm('server shutdown 180')
+        while time.monotonic() - started < 240:
+            state = inspect(WORLD)
+            require(state['Id'] == current['Id'], 'Cloud container changed during countdown')
+            if not state['State']['Running']:
+                require(time.monotonic() - started >= 175, 'Cloud exited before shutdown countdown completed')
+                return
+            time.sleep(2)
+        raise RuntimeError('Cloud shutdown countdown did not complete')
+    except Exception:
+        if inspect(WORLD)['State']['Running']:
+            gm('server shutdown cancel')
+        command(['docker', 'update', '--restart', restart, WORLD])
+        raise
 
 
 def create_args(current, binary):
@@ -194,8 +256,6 @@ def run(manifest, check_only, resume_publish=False):
     with (transactions / 'activation.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         preflight(package, payload)
-        require(sql('SELECT COUNT(*) FROM acore_characters.characters WHERE online<>0 AND account NOT IN (30,31);').strip() == b'0',
-                'Log all characters out of Cloud before activation')
         tx = transactions / package['id']
         check_deployment_target(package)
         protected = {name: inspect(name)['Id'] for name in
@@ -217,6 +277,8 @@ def run(manifest, check_only, resume_publish=False):
         changed = False
         changed_clients = []
         try:
+            record('announcing_cloud_shutdown')
+            shutdown_notice(package, current)
             record('stopping_cloud')
             command(['docker', 'stop', '--time', '60', WORLD])
             require(readback(package) == package['before_rows_sha256'], 'SQL changed while stopping')
@@ -256,6 +318,8 @@ def run(manifest, check_only, resume_publish=False):
             state['failed_phase'] = state['status']
             state['error_category'] = type(error).__name__
             record('rollback_required')
+            if not renamed and state['failed_phase'] == 'announcing_cloud_shutdown':
+                raise
             if renamed:
                 exists = subprocess.run(['docker', 'inspect', WORLD], capture_output=True).returncode == 0
                 if exists:
@@ -271,6 +335,8 @@ def run(manifest, check_only, resume_publish=False):
                     shutil.copy2(tx / ('client-before-' + str(index)), item['target'])
                     require(digest(item['target']) == item['before_sha256'], 'Client rollback mismatch')
                 command(['docker', 'rename', retained, WORLD])
+            command(['docker', 'update', '--restart',
+                     current['HostConfig'].get('RestartPolicy', {}).get('Name', 'no'), WORLD])
             command(['docker', 'start', WORLD])
             record('rolled_back')
             raise

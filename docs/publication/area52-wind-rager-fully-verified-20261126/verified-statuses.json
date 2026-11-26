@@ -1,0 +1,235 @@
+{
+  "target": "Development",
+  "status": "verified offline, not activated",
+  "changes": [
+    {
+      "kind": "mystic",
+      "id": 913715,
+      "name": "Dual Wield Specialization",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "dual-spree-final-r1",
+        "r15"
+      ]
+    },
+    {
+      "kind": "mystic",
+      "id": 929721,
+      "name": "Improved Whirlwind",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "modifiers-r2",
+        "real-catalog-r1",
+        "r11"
+      ]
+    },
+    {
+      "kind": "mystic",
+      "id": 948488,
+      "name": "Gale Winds",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "modifiers-r2",
+        "real-catalog-r1",
+        "r11"
+      ]
+    },
+    {
+      "kind": "mystic",
+      "id": 956927,
+      "name": "Unending Fury",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "modifiers-r2",
+        "real-catalog-r1",
+        "r11"
+      ]
+    },
+    {
+      "kind": "mystic",
+      "id": 977725,
+      "name": "Controlled Typhoon",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "typhoon-combined-r1",
+        "typhoon-link-r2",
+        "typhoon-motion-r2",
+        "r15"
+      ]
+    },
+    {
+      "kind": "mystic",
+      "id": 978232,
+      "name": "Wind Rager",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "area52_wind_rager_cycle",
+        "area52_wind_scaling",
+        "area52_wind_charge_cycle",
+        "area52_wind_remaining_lifecycle",
+        "combined-final-r3",
+        "r25",
+        "sql-fixture-r4",
+        "client-final-r2"
+      ]
+    },
+    {
+      "kind": "mystic",
+      "id": 979769,
+      "name": "Zephyr",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "zephyr-r3",
+        "zephyr-lifecycle-r1",
+        "real-catalog-r1",
+        "haste-r1",
+        "typhoon-link-r2",
+        "zephyr-chance-r2",
+        "r15"
+      ]
+    },
+    {
+      "kind": "mystic",
+      "id": 997082,
+      "name": "Desolate Wind Bolt",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "area52_wind_desolate_extension",
+        "area52_wind_desolate_startup",
+        "area52_wind_connection_startup",
+        "area52_wind_final_modifiers",
+        "area52_wind_charge_cycle",
+        "area52_wind_proc_admission",
+        "area52_wind_remaining_lifecycle",
+        "combined-final-r3",
+        "r25",
+        "sql-fixture-r4",
+        "client-final-r2"
+      ]
+    },
+    {
+      "kind": "advancement",
+      "id": 577,
+      "name": "Flurry",
+      "previous_status": "Structurally Connected, Unverified",
+      "status": "VERIFIED",
+      "evidence": [
+        "flurry-r1",
+        "flurry-cycle-r2",
+        "talent-cleanup-r1",
+        "haste-r1",
+        "r11"
+      ]
+    },
+    {
+      "kind": "advancement",
+      "id": 1318,
+      "name": "Water Totem Mastery",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "mastery-r5/report/report.json",
+        "lifecycle-r1/report/report.json:area52_wind_ability_login"
+      ]
+    },
+    {
+      "kind": "advancement",
+      "id": 826,
+      "name": "Dual Wield Specialization",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "dual-spree-final-r1",
+        "r15"
+      ]
+    },
+    {
+      "kind": "advancement",
+      "id": 2936,
+      "name": "Deterrence",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "combined-final-r1",
+        "defensive-rune-baselines-r1",
+        "r18"
+      ]
+    },
+    {
+      "kind": "advancement",
+      "id": 3707,
+      "name": "Killing Spree",
+      "previous_status": "Structurally Connected, Unverified",
+      "status": "VERIFIED",
+      "evidence": [
+        "dual-spree-final-r1",
+        "r15"
+      ]
+    },
+    {
+      "kind": "advancement",
+      "id": 819,
+      "name": "Unrelenting Storm",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "area52_wind_unrelenting",
+        "area52_wind_vulnerability",
+        "area52_wind_talent_cleanup",
+        "combined-final-r3",
+        "r25",
+        "sql-fixture-r4",
+        "client-final-r2"
+      ]
+    },
+    {
+      "kind": "advancement",
+      "id": 1233,
+      "name": "Dancing Rune Weapon",
+      "previous_status": "Structurally Connected, Unverified",
+      "status": "VERIFIED",
+      "evidence": [
+        "combined-final-r1",
+        "defensive-rune-baselines-r1",
+        "r18"
+      ]
+    },
+    {
+      "kind": "advancement",
+      "id": 821,
+      "name": "Lightning Overload",
+      "previous_status": "Structurally Connected, Unverified",
+      "status": "VERIFIED",
+      "evidence": [
+        "area52_wind_overload",
+        "area52_wind_overload_dispatch",
+        "area52_wind_overload_capture",
+        "area52_wind_unrelenting",
+        "combined-final-r3",
+        "r25",
+        "sql-fixture-r4",
+        "client-final-r2"
+      ]
+    },
+    {
+      "kind": "advancement",
+      "id": 1319,
+      "name": "Earth Totem Mastery",
+      "previous_status": "Needs Investigation",
+      "status": "VERIFIED",
+      "evidence": [
+        "mastery-r5/report/report.json",
+        "lifecycle-r1/report/report.json:area52_wind_ability_login"
+      ]
+    }
+  ],
+  "preserve_certifications": true
+}

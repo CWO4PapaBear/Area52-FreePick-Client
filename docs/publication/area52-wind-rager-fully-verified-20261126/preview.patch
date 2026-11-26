@@ -1,0 +1,82 @@
+--- a/Interface/AddOns/Ascension_BuildCreator/BuildEditor/EditableBuildView.lua
++++ b/Interface/AddOns/Ascension_BuildCreator/BuildEditor/EditableBuildView.lua
+@@ -3620,6 +3620,13 @@
+         local marker="###AREA52_FEATURED_WEAPONS\n"
+         local _,count=description:gsub(marker,"")
+         local value=description:match("###AREA52_FEATURED_WEAPONS\n1:([0-3])\n") or description:match("###AREA52_FEATURED_WEAPONS\n1:([0-3])$")
++        local stanceMarker="###AREA52_FEATURED_STANCE\n"
++        local _,stanceCount=description:gsub(stanceMarker, "")
++        local stanceText=description:match("###AREA52_FEATURED_STANCE\n1:(%d+)\n") or description:match("###AREA52_FEATURED_STANCE\n1:(%d+)$")
++        local stance=tonumber(stanceText)
++        local allowed={[0]=true,[25]=true,[26]=true,[27]=true,[28]=true,[29]=true,[48]=true,[51]=true,[52]=true,[4294967295]=true}
++        view.Area52CreationStance=stance or 4294967295
++        view.Area52CreationStanceInvalid=stanceCount>1 or (stanceCount==1 and not allowed[stance])
+         view.Area52WeaponVisibility=tonumber(value) or 0
+         view.Area52WeaponVisibilityInvalid=count>1 or (count==1 and not value)
+         view.Area52PreviewEffects=F.ReadPreview(build.Description)
+@@ -3665,7 +3672,9 @@
+     description=(description or ""):gsub("\n*###AREA52_FEATURED_PREVIEW[^#]*","")
+     description=description:gsub("\n*###AREA52_FEATURED_INCARNATIONS[^#]*","")
+     description=description:gsub("\n*###AREA52_FEATURED_WEAPONS[^#]*","")
++    description=description:gsub("\n*###AREA52_FEATURED_STANCE[^#]*", "")
+     if F.Applies() then
++        description=description.."\n\n###AREA52_FEATURED_STANCE\n1:"..tostring(view.Area52CreationStance or 4294967295)
+         description=description.."\n\n###AREA52_FEATURED_WEAPONS\n1:"..tostring(view.Area52WeaponVisibility or 0)
+     end
+     if F.Applies() and view.Area52PreviewEffects then
+@@ -3678,7 +3687,7 @@
+ local previousValidate=Area52CanPublishBuild
+ function Area52CanPublishBuild(view)
+     if F.Applies() and view.Area52ImportPending then return false,{"Archetype items are still loading. Wait before saving."} end
+-    if F.Applies() and (view.Area52PreviewInvalid or view.Area52WeaponVisibilityInvalid) then return false,{"Invalid Character Creation preview settings. Reopen an intact saved build."} end
++    if F.Applies() and (view.Area52PreviewInvalid or view.Area52WeaponVisibilityInvalid or view.Area52CreationStanceInvalid) then return false,{"Invalid Character Creation preview settings. Reopen an intact saved build."} end
+     return previousValidate(view)
+ end
+ local previousReason=Area52BuildPublishReason
+@@ -4295,7 +4304,7 @@
+     hint:SetPoint("TOPLEFT",12,-532);hint:SetText("Left-drag a model to rotate. Drag the title bar to move this window.")
+     local base=view:GetName().."FeaturedScene"
+     scene.drops={}
+-    for i,title in ipairs({"Character cast visual","Pet cast visual","Editor stance","Weapons shown in Character Creation"}) do
++    for i,title in ipairs({"Character cast visual","Pet cast visual","Character Creation stance","Weapons shown in Character Creation"}) do
+         label(panel,title,460,-30-(i-1)*60)
+         scene.drops[i]=castSelector(view,panel,i,title)
+     end
+@@ -4370,11 +4379,13 @@
+             if F.ValidContext(ctx) then choose(view,idx,id) end
+         end)
+     end
+-    local choices={}
++    local choices={{id=4294967295,name="Archetype default"}}
+     for _,p in ipairs(poses) do choices[#choices+1]={id=p[1],name=p[2]} end
+-    scene.drops[3]:SetCastChoices(choices,scene.pose or 0,function(id)
++    scene.drops[3]:SetCastChoices(choices,view.Area52CreationStance or 4294967295,function(id)
+         if not F.ValidContext(ctx) then return end
+-        scene.pose=id;idle(scene,1)
++        view.Area52CreationStance=id;view.Area52CreationStanceInvalid=false
++        scene.pose=id==4294967295 and 0 or id;idle(scene,1)
++        view:UpdatePendingBuild()
+         F.RefreshPreviewControls(view)
+     end)
+     scene.drops[4]:SetCastChoices({{id=0,name="All assigned weapons"},{id=1,name="Melee / off-hand only"},{id=2,name="Ranged only"},{id=3,name="None"}},view.Area52WeaponVisibility or 0,function(id)
+@@ -4413,6 +4424,6 @@
+     if view.Area52PreviewWindow and previous~=view.Area52FeaturedGeneration then
+         view.Area52PreviewWindow:Hide()
+         local scene=view.Area52PreviewSection and view.Area52PreviewSection.scene
+-        if scene then scene.pose=0;scene.key=nil;F.RefreshPreviewControls(view) end
+-    end
+-end
++        if scene then scene.pose=view.Area52CreationStance~=4294967295 and view.Area52CreationStance or 0;scene.key=nil;F.RefreshPreviewControls(view) end
++    end
++end
+--- a/Interface/FrameXML/Util/BuildCreatorUtil.lua
++++ b/Interface/FrameXML/Util/BuildCreatorUtil.lua
+@@ -102,7 +102,7 @@
+ 
+ local function Area52VisibleDescription(description)
+     if GetRealmName() ~= "Area 52 - Free-Pick" then return description end
+-    for _,key in ipairs({"ARCHETYPE_ID","FEATURED_VANITY","FEATURED_IMPORTED","FEATURED_PREVIEW","FEATURED_INCARNATIONS","CREATION_SUMMARY","FEATURED_WEAPONS"}) do
++    for _,key in ipairs({"ARCHETYPE_ID","FEATURED_VANITY","FEATURED_IMPORTED","FEATURED_PREVIEW","FEATURED_INCARNATIONS","CREATION_SUMMARY","FEATURED_WEAPONS","FEATURED_STANCE"}) do
+         description=description:gsub("\n*###AREA52_"..key.."[^#]*","")
+     end
+     return description

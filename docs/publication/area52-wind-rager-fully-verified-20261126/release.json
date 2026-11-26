@@ -1,0 +1,39 @@
+{
+  "package": "area52-wind-rager-fully-verified-20261126",
+  "members": [
+    {
+      "path": "Interface/AddOns/Ascension_BuildCreator/BuildEditor/EditableBuildView.lua",
+      "before_sha256": "0d0e2b85ae181dd1cc96cbfc8d365fa695615772da9c43e43e59178f3161bb2c",
+      "after_sha256": "52bf528870ab608111047fa5951978d31274fc46c1f26278b423ffea96e162dc"
+    },
+    {
+      "path": "Interface/FrameXML/Util/BuildCreatorUtil.lua",
+      "before_sha256": "b78ae23fb93002cf7bc116dc4f56a837893ee3f5c5870232a1871257ca1b98ef",
+      "after_sha256": "27c7b17c340ed18dc36b684a8ad718fc248b56a833dc969d7fa76cd24703479f"
+    }
+  ],
+  "client_archives": [
+    {
+      "file": "patch-D.MPQ",
+      "installed_before_sha256": "76dad76de610fa0c78ddc7d83b1f6d54739945df8e02c42b5c1ed8ae06eb7ded",
+      "candidate_sha256": "2c226ca35f09e49234790bb8ec72c6918dea72f932cd983ff9d57a3f3152f888",
+      "public_changed_members": [
+        "DBFilesClient\\Spell.dbc"
+      ],
+      "preserved_non_spell_members": 27
+    },
+    {
+      "file": "patch-E.MPQ",
+      "installed_before_sha256": "0cc530be9c7793df6b3ca60cd06e57b78c65ca12fc6b7e0347e90f75b8d00be3",
+      "candidate_sha256": "1dab08f0d8ac32d1b76166e0b50a5abfd6f2fe2b9d4c390f98e324ee40696c6a",
+      "public_changed_members": [
+        "DBFilesClient\\Spell.dbc",
+        "Interface\\AddOns\\Ascension_BuildCreator\\BuildEditor\\EditableBuildView.lua",
+        "Interface\\FrameXML\\Util\\BuildCreatorUtil.lua"
+      ],
+      "preserved_non_spell_members": 75
+    }
+  ],
+  "verification": "Exact patch replay passed; both archive readbacks and label/record preservation verified offline",
+  "delivery": "prepared, not published"
+}
