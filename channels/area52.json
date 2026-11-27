@@ -1,9 +1,9 @@
 {
   "channel": "area52",
   "enabled": true,
-  "manifest_sha256": "ab7a9188451e7f07fffb0e0aca365cf79461bf5837e96d75da4f482ca2b8a745",
+  "manifest_sha256": "b2a8c7b2abf831f98eaad8b773e8907291bcd73de6c9d523b3ce5337bbde0a11",
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-catalog-d05019feee56cac39effc66b33afc2b1/manifest.json",
-  "message": "Area 52 \u2014 Featured Build editor improvements",
+  "message": "Featured Build - Dragon Warrior - Fully Verified",
   "name": "Area 52 - Free Pick Alpha Test",
   "schema": 1
 }
