@@ -1,9 +1,9 @@
 {
   "channel": "area52",
   "enabled": true,
-  "manifest_sha256": "b2a8c7b2abf831f98eaad8b773e8907291bcd73de6c9d523b3ce5337bbde0a11",
+  "manifest_sha256": "da26533f64063f86f0f7aaf2ec63c5e8d3b3c0f5166d2daa2c85e83bf0ea960d",
   "manifest_url": "https://github.com/CWO4PapaBear/Area52-FreePick-Client/releases/download/area52-catalog-d05019feee56cac39effc66b33afc2b1/manifest.json",
-  "message": "Featured Build - Dragon Warrior - Fully Verified",
+  "message": "Featured Build - Crusader - Fully Verified",
   "name": "Area 52 - Free Pick Alpha Test",
   "schema": 1
 }
