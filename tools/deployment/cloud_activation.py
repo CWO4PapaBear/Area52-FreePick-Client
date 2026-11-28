@@ -81,8 +81,11 @@ def validate(package, payload):
         require(str(target) not in targets and item['artifact'] in names, 'Invalid client artifact')
         targets.add(str(target))
     require(package['runner_sha256'] == digest(__file__), 'Cloud runner changed; requalify package')
+    if 'rollback_rows_sha256' in package:
+        require(re.fullmatch(r'[0-9a-f]{64}', package['rollback_rows_sha256']) is not None,
+                'Invalid rollback row digest')
     columns = r'`[A-Za-z0-9_]+`(?:,`[A-Za-z0-9_]+`)*'
-    tables = r'(?:spell_script_names|spell_proc|spell_dbc|spell_group|spell_group_stack_rules|item_template|quest_template|quest_template_addon|item_loot_template|acore_playerbots\.(?:playerbots_legendary_class|playerbots_legendary_weight|playerbots_custom_strategy|playerbots_legendary_pick|playerbots_legendary_enchant))'
+    tables = r'(?:creature_template|creature_template_model|acore_characters\.(?:area52_build|area52_build_revision|area52_build_featured|area52_build_archetype)|spell_script_names|spell_proc|spell_dbc|spell_group|spell_group_stack_rules|item_template|quest_template|quest_template_addon|item_loot_template|acore_playerbots\.(?:playerbots_legendary_class|playerbots_legendary_weight|playerbots_custom_strategy|playerbots_legendary_pick|playerbots_legendary_enchant))'
     pattern = r'SELECT JSON_ARRAY\(' + columns + r'\) FROM ' + tables
     literal = r"(?:-?[0-9]+|'[A-Za-z0-9_-]+')"
     term = r'[A-Za-z0-9_]+\s*(?:=\s*' + literal + r'|IN\s*\(' + literal + r'(?:,\s*' + literal + r')*\))'
@@ -103,7 +106,7 @@ def restore_rows(package, payload):
     require(current == package['after_rows_sha256'],
             'Cloud rollback blocked by unexpected database state; retain transaction for review')
     sql('START TRANSACTION;\n' + (payload / package['rollback']).read_text() + '\nCOMMIT;')
-    require(readback(package) == package['before_rows_sha256'], 'Rollback row mismatch')
+    require(readback(package) == package.get('rollback_rows_sha256', package['before_rows_sha256']), 'Rollback row mismatch')
 
 
 def retained_name(package):
